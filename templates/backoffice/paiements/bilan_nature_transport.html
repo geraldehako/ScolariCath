@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>État récapitulatif des paiements de transport par nature</h3>
+  <table class="table table-bordered mt-3">
+    <thead>
+      <tr>
+        <th>Mode de paiement</th>
+        <th>Total reçu (FCFA)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in bilan %}
+      <tr>
+        <td>{{ ligne.libelle }}</td>
+        <td>{{ ligne.total|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th>Total général</th>
+        <th>
+            {{ total_general|floatformat:0 }}
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endblock %}

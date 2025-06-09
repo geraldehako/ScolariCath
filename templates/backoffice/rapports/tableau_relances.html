@@ -1,0 +1,59 @@
+{% extends 'base/base back.html' %}
+{% load static %}
+
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    📌 Suivi scolarité attendu par établissement <span class="text-danger">{{ annee_active.libelle }}</span>
+</h6>
+<hr><br>
+
+<!-- Bouton d'ajout ou autre action -->
+<div class="mb-3">
+    <a href="{% url 'rapport_export_relances_pdf' %}" class="btn btn-danger">📄 Exporter en PDF</a>
+    <a href="{% url 'rapport_export_relances_excel' %}" class="btn btn-success">📊 Exporter en Excel</a>
+</div>
+
+<table id="relanceTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Établissement</th>
+            <th>Total Échéance</th>
+            <th>Total Versé</th>
+            <th>Total Solde</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in resultats %}
+        <tr>
+            <td>{{ item.inscription__classe__etablissement__nom }}</td>
+            <td>{{ item.total_echeance|default:"0" }}</td>
+            <td>{{ item.total_verse|default:"0" }}</td>
+            <td>{{ item.total_solde|default:"0" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+<script>
+    $(document).ready(function() {
+        $('#relanceTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

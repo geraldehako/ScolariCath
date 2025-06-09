@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Suivi scolarité attendu par établissement</title>
+    <style>
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Suivi scolarité attendu par établissement {{ annee }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Établissement</th>
+                <th>Montant Échéances</th>
+                <th>Total Versé</th>
+                <th>Total Solde</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in relances %}
+            <tr>
+                <td>{{ item.inscription__classe__etablissement__nom }}</td>
+                <td>{{ item.somme_montant }}</td>
+                <td>{{ item.somme_verse }}</td>
+                <td>{{ item.somme_solde }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

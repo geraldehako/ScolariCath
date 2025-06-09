@@ -1,0 +1,62 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+  
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Suivi des <span class="text-danger">arriérés de scolarité</span>
+    </h6>
+    <hr></br>
+
+    <div class="mb-3 d-flex justify-content-end">
+        <a href="{% url 'export_paiements_arrieres_excel' %}" class="btn btn-success me-2">
+            <i class="bi bi-file-earmark-excel"></i> Exporter Excel
+        </a>
+        <a href="{% url 'export_paiements_arrieres_pdf' %}" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Exporter PDF
+        </a>
+    </div>
+
+    <table id="arrieresTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Établissement</th>
+                <th>Élève</th>
+                <th>Classe</th>
+                <th>Échéance</th>
+                <th>Modalité</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for arriere in arrieres %}
+            <tr>
+                <td>{{ arriere.etablissement }}</td>
+                <td>{{ arriere.eleve.nom }} {{ arriere.eleve.prenoms }}</td>
+                <td>{{ arriere.eleve.classe.nom }}</td>
+                <td>{{ arriere.echeance.nom }}</td>
+                <td>{{ arriere.echeance.modalite.nom }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'dashboard_direction' %}" class="btn btn-secondary mt-3">
+        ← Retour au tableau de bord
+    </a>   
+
+    <script>
+        $(document).ready(function() {
+            $('#arrieresTable').DataTable({
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ entrées",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

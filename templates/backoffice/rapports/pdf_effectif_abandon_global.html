@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 12px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 4px;
+            text-align: left;
+        }
+        h2, h4 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Effectif des abandons - Année {{ annee }}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Établissement</th>
+                <th>Niveau</th>
+                <th>Effectif d'abandon</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.etablissement }}</td>
+                <td>{{ row.niveau }}</td>
+                <td>{{ row.effectif }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2"><strong>Total général</strong></td>
+                <td><strong>{{ total_abandons }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

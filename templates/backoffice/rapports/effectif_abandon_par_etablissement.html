@@ -1,0 +1,59 @@
+{% extends 'base/base back.html' %}
+
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Suivi des effectifs des abandons – <span class="text-danger">Tous établissements ({{ annee.libelle }})</span>
+</h6>
+<hr></br>
+<div class="mb-3">
+    <a href="{% url 'export_effectif_abandon_global_excel' %}" class="btn btn-success mt-3">Exporter en Excel</a>
+    <a href="{% url 'export_effectif_abandon_global_pdf' %}" class="btn btn-danger mt-3">Exporter en PDF</a>
+
+</div>
+
+<table class="table table-bordered table-striped" id="tableEffectif">
+    <thead>
+        <tr>
+            <th>Établissement</th>
+            <th>Niveau</th>
+            <th>Effectif d'abandon</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.etablissement }}</td>
+            <td>{{ row.niveau }}</td>
+            <td>{{ row.effectif }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total général des abandons</th>
+            <th>{{ total_abandons }}</th>
+        </tr>
+    </tfoot>
+</table>
+
+<a href="{% url 'dashboard_tresorerie' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#tableEffectif').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

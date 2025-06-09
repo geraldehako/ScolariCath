@@ -1,0 +1,171 @@
+{% extends 'base/base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">Paiement des échéances – <span class="text-primary">{{ inscription.eleve.nom }} {{ inscription.eleve.prenoms }}</span></h3>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total dû</h5>
+                    <p class="card-text fs-5" id="total-du">{{ total_du }} FCFA</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Déjà payé</h5>
+                    <p class="card-text fs-5" id="total-paye">{{ total_paye }} FCFA</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Solde restant</h5>
+                    <p class="card-text fs-5" id="solde-restant">{{ solde }} FCFA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="mb-3">
+                    <label class="form-label">{{ form.mode_paiement.label }}</label>
+                    {{ form.mode_paiement }}
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="mb-3">
+                    <label class="form-label">{{ form.numero_transaction.label }}</label>
+                    {{ form.numero_transaction }}
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="mb-3">
+                    <label class="form-label">{{ form.justificatif.label }}</label>
+                    {{ form.justificatif }}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h5 class="mb-3">Détails des échéances</h5>
+        {% for relance, field_name in form.relance_fields %}
+            {% with champ=form|get_item:field_name %}
+                <div class="mb-4">
+                    <label class="form-label">
+                        {{ champ.label|safe }}
+                    </label>
+                    <div class="input-group">
+                        {{ champ }}
+                        {% if champ.field.widget.attrs.readonly %}
+                            <span class="input-group-text bg-light text-muted">Échéance soldée</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i> Enregistrer les paiements
+            </button>
+        </div>
+    </form> 
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const totalPayeInitial = parseInt(document.getElementById("total-paye").textContent) || 0;
+        const totalDu = parseInt(document.getElementById("total-du").textContent) || 0;
+        const soldeRestantElement = document.getElementById("solde-restant");
+
+        const modePaiement = document.getElementById('id_mode_paiement');
+        const numeroTransactionGroup = document.querySelector('[for="id_numero_transaction"]').closest('.mb-3');
+
+        function toggleNumeroTransaction() {
+        if (modePaiement.value === 'virement') {
+            numeroTransactionGroup.style.display = 'block';
+        } else {
+            numeroTransactionGroup.style.display = 'none';
+        }
+        }
+
+        modePaiement.addEventListener('change', toggleNumeroTransaction);
+        toggleNumeroTransaction();  // au chargement
+
+        function updateSolde() {
+            let totalSaisi = 0;
+            document.querySelectorAll("input[type='number']").forEach(input => {
+                const val = parseInt(input.value);
+                if (!isNaN(val)) {
+                    totalSaisi += val;
+                }
+            });
+
+            const nouveauTotal = totalPayeInitial + totalSaisi;
+            const nouveauSolde = totalDu - nouveauTotal;
+            soldeRestantElement.textContent = nouveauSolde >= 0 ? nouveauSolde : 0;
+        }
+
+        document.querySelectorAll("input[type='number']").forEach(input => {
+            input.addEventListener("input", updateSolde);
+        });
+        // ✅ Confirmation avant soumission du formulaire
+        const form = document.querySelector("form");
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+        
+            const modePaiement = document.querySelector("#id_mode_paiement").value;
+            const totalSaisi = Array.from(document.querySelectorAll("input[type='number']"))
+                .map(input => parseInt(input.value) || 0)
+                .reduce((acc, val) => acc + val, 0);
+        
+            if (totalSaisi <= 0) {
+                alert("Veuillez saisir au moins un montant supérieur à 0 pour continuer.");
+                return;
+            }
+        
+            const confirmation = confirm(`Vous allez enregistrer un paiement total de ${totalSaisi} FCFA. Voulez-vous continuer ?`);
+            if (!confirmation) return;
+        
+            if (modePaiement === "mobile_money") {
+                try {
+                    const response = await fetch("{% url 'init_cinetpay' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}",
+                        },
+                        body: JSON.stringify({
+                            inscription_id: "{{ inscription.id }}",
+                            montant: totalSaisi,
+                        }),
+                    });
+        
+                    const data = await response.json();
+                    if (data.url) {
+                        window.location.href = data.url;  // Redirige vers l'interface de paiement CinetPay
+                    } else {
+                        alert("Une erreur est survenue lors de l'initialisation du paiement CinetPay.");
+                    }
+                } catch (err) {
+                    alert("Erreur réseau : " + err);
+                }
+            } else {
+                // Paiement classique (espèces, virement, etc.)
+                form.submit();
+            }
+        });
+        
+    });
+</script>
+{% endblock %}

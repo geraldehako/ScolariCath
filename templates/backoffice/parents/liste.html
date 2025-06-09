@@ -1,0 +1,60 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+     Base de données des <span class="text-danger">parents</span> 
+</h6>
+<hr><br>
+
+
+    <table id="mesparentsTable" class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Élève</th>
+                <th>Parent</th>
+                <th>Téléphone</th>
+                <th>Email</th>
+                <th>Lien</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lien in liens %}
+                <tr>
+                    <td>{{ lien.eleve }}</td>
+                    <td>{{ lien.parent.nom_complet }}</td>
+                    <td>{{ lien.parent.telephone }}</td>
+                    <td>{{ lien.parent.email }}</td>
+                    <td>{{ lien.lien }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">Aucun lien de parenté trouvé.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+<a href="{% url 'dashboard_tresorerie' %}" class="btn btn-secondary mt-3">
+    ← Retour au tableau de bord
+</a>
+
+
+<script>
+    $(document).ready(function() {
+        $('#mesparentsTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

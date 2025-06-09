@@ -1,0 +1,75 @@
+{% extends 'base/base back.html' %}
+{% load my_tags %}
+
+{% block content %}
+ 
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Suivi des effectifs – <span class="text-danger">Secondaire ({{ annee.libelle }})</span>
+</h6>
+<hr></br>
+<div class="mb-3">
+    <a href="{% url 'export_effectif_excel_sec' %}" class="btn btn-success mt-3">Exporter en Excel</a>
+    <a href="{% url 'export_effectif_pdf_sec' %}" class="btn btn-danger mt-3">Exporter en PDF</a>
+</div>
+
+<table id="tableEffectif" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Établissement</th>
+            {% for niveau in niveaux %}
+                <th>{{ niveau }} (G)</th>
+                <th>{{ niveau }} (F)</th>
+            {% endfor %}
+            <th>Total Garçons</th>
+            <th>Total Filles</th>
+            <th>Total Général</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for etab, niveaux_data in effectif_dict.items %}
+            <tr>
+                <td>{{ etab }}</td>
+                {% for niveau in niveaux %}
+                    <td>{{ niveaux_data|get_dict:niveau|get_nested_value:"M" }}</td>
+                    <td>{{ niveaux_data|get_dict:niveau|get_nested_value:"F" }}</td>
+                {% endfor %}
+                <td>{{ niveaux_data|get_dict:"TOTAL"|get_nested_value:"M" }}</td>
+                <td>{{ niveaux_data|get_dict:"TOTAL"|get_nested_value:"F" }}</td>
+                <td>{{ niveaux_data|get_dict:"TOTAL"|get_nested_value:"TOTAL" }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            {% for niveau in niveaux %}
+                <th>{{ total_par_niveau_genre|get_dict:niveau|get_nested_value:"M" }}</th>
+                <th>{{ total_par_niveau_genre|get_dict:niveau|get_nested_value:"F" }}</th>
+            {% endfor %}
+            <th>{{ total_garcons }}</th>
+            <th>{{ total_filles }}</th>
+            <th>{{ total_garcons|add:total_filles }}</th>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- DataTables JS -->
+
+<script>
+    $(document).ready(function() {
+        $('#tableEffectif').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

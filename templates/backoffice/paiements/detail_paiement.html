@@ -1,0 +1,50 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">💳 Paiements - {{ eleve.nom }} {{ eleve.prenoms }}</h4>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <p><strong>Total dû :</strong> {{ inscription.montant_total_du|floatformat:0 }} FCFA</p>
+          <p><strong>Total payé :</strong> {{ inscription.montant_total_paye|floatformat:0 }} FCFA</p>
+          <p><strong>Solde restant :</strong> {{ inscription.solde_restant|floatformat:0 }} FCFA</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Statut du paiement :</strong> 
+            <span class="badge 
+              {% if inscription.statut_paiement_affichage == '🟢 Payé' %}
+                bg-success
+              {% elif inscription.statut_paiement_affichage == '🟡 Partiellement payé' %}
+                bg-warning text-dark
+              {% else %}
+                bg-danger
+              {% endif %}
+            ">
+              {{ inscription.statut_paiement_affichage }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {% if inscription.statut_paiement_affichage != "🟢 Payé" %}
+        <a href="{% url 'ajouter_paiement' inscription.id %}" class="btn btn-success">
+          ➕ Ajouter un paiement
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if request.GET.recu == '1' %}
+  <script>
+    window.onload = function() {
+      window.open("{% url 'recu_paiement_pdf' inscription_id=inscription.id %}", "_blank");
+    }
+  </script>
+{% endif %}
+
+{% endblock %}
