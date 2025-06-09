@@ -1,0 +1,15 @@
+/*
+         * Preparation des elements constituant le panier
+         */
+        /*
+          $apiKey = "15682243495abbc3a2577997.44696975"; // Remplacez ce champs par votre APIKEY | manutine = 15682243495abbc3a2577997.44696975 | defaut = 21585943f75164bbc2.38014639
+          $site_id = "237055"; // Remplacez ce champs par votre SiteID | Manutine = 638193 | defaut = 296911
+         */
+        // $array_cpm_custom += ["Plateforme" => $base_url];
+
+
+        /*
+                  //Veuillez entrer votre apiKey et site ID
+                  $apiKey = "15682243495abbc3a2577997.44696975"; // Remplacez ce champs par votre APIKEY | manutine = 15682243495abbc3a2577997.44696975 | defaut = 21585943f75164bbc2.38014639
+                  $site_id = "237055"; // Remplacez ce champs par votre SiteID | Manutine = 638193 | defaut = 296911
+                 */
