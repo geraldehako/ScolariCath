@@ -1,0 +1,91 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    📌 Balance des opérations – <span class="text-danger">{{ caisse.nom }}</span>
+</h6>
+<hr><br>
+<a href="{% url 'ajouter_operation' caisse.id %}" class="btn btn-primary mb-3">Ajouter une opération</a>
+
+<table id="mesdepensesTable" class="table table-bordered table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Motif</th>
+      <th>Montant Entrée</th>
+      <th>Montant Sortie</th>
+      <th>Responsable</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for op in operations %}
+    <tr>
+      <td>{{ op.date_operation }}</td>
+      <td>{{ op.get_type_operation_display }}</td>
+      <td>{{ op.motif|default:"-" }}</td>
+      <td>{% if op.type_operation == 'entree' %}{{ op.montant }} FCFA{% else %}-{% endif %}</td>
+      <td>{% if op.type_operation == 'sortie' %}{{ op.montant }} FCFA{% else %}-{% endif %}</td>
+      <td>{{ op.responsable }}</td>
+      <td>
+        <a href="{% url 'modifier_operation' op.id %}" class="btn btn-sm btn-warning">Modifier</a>
+        <!-- Bouton pour ouvrir le modal -->
+        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalSuppression{{ op.id }}">
+            Supprimer
+        </button>
+
+        <!-- Modal de confirmation -->
+        <div class="modal fade" id="modalSuppression{{ op.id }}" tabindex="-1" aria-labelledby="modalSuppressionLabel{{ op.id }}" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalSuppressionLabel{{ op.id }}">Confirmation de suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+              </div>
+              <div class="modal-body">
+                Voulez-vous vraiment supprimer cette opération ?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'supprimer_operation' op.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="mt-4">
+  <strong>Total Entrées :</strong> {{ total_entrees }} FCFA<br>
+  <strong>Total Sorties :</strong> {{ total_sorties }} FCFA<br>
+  <strong>Solde :</strong> {{ solde }} FCFA
+</div>
+
+<a href="{% url 'dashboard_tresorerie' %}" class="btn btn-secondary mt-3">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#mesdepensesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

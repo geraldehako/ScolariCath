@@ -1,0 +1,30 @@
+<h2>Liste des mutations de personnels</h2>
+<a href="{% url 'ajouter_mutation' %}" class="btn btn-primary mb-3">Nouvelle mutation</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Personnel</th>
+            <th>De</th>
+            <th>À</th>
+            <th>Date</th>
+            <th>Motif</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mutation in mutations %}
+        <tr>
+            <td>{{ mutation.personnel.nom_complet }}</td>
+            <td>{{ mutation.etablissement_source.nom }}</td>
+            <td>{{ mutation.etablissement_destination.nom }}</td>
+            <td>{{ mutation.date_mutation }}</td>
+            <td>{{ mutation.motif|truncatewords:10 }}</td>
+            <td>
+                <a href="{% url 'modifier_mutation' mutation.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'supprimer_mutation' mutation.id %}" class="btn btn-sm btn-danger">Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

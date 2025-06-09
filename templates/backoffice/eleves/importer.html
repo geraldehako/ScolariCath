@@ -1,0 +1,6 @@
+<h2>Importer des élèves depuis Excel</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="fichier" accept=".xlsx,.xls" required>
+    <button type="submit">Importer</button>
+</form>

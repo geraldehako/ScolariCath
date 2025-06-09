@@ -1,0 +1,10 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<h1>{{ action }} une Caisse</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">{{ action }}</button>
+</form>
+<a href="{% url 'liste_caisses' %}">Retour à la liste</a>
+{% endblock %}

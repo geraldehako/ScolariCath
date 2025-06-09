@@ -1,0 +1,54 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+     Base de données des <span class="text-danger">élèves</span> 
+</h6>
+<hr><br>
+
+
+<table id="meselevesTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Matricule</th><th>Nom</th><th>Prénoms</th><th>Date naissance</th><th>Lieu naissance</th><th>Sexe</th><th>Age</th><th>Nationalité</th><th>Religion</th><th>Établissement</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for eleve in eleves %}
+        <tr>
+            <td>{{ eleve.matricule }}</td>
+            <td>{{ eleve.nom }}</td>
+            <td>{{ eleve.prenoms }}</td>
+            <td>{{ eleve.date_naissance }}</td>
+            <td>{{ eleve.lieu_naissance }}</td>
+            <td>{{ eleve.get_sexe_display }}</td>
+            <td>{{ eleve.age }}</td>
+            <td>{{ eleve.nationalite }}</td>
+            <td>{{ eleve.religion }}</td>
+            <td>{{ eleve.origine }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard_tresorerie' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#meselevesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+ 

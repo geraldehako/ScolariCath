@@ -1,0 +1,128 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    📌 Suivi de la caisse principale – <span class="text-danger">année scolaire {{ annee_active.libelle }}</span>
+</h6>
+<hr><br>
+{% if caisses %}
+<div class="row justify-content-center">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">{{ caisses.nom }}</h5>
+                <span class="badge bg-light text-primary">{{ caisses.date_creation|date:"d/m/Y" }}</span>
+            </div>
+            <div class="card-body">
+                <p><strong>Entrées :</strong> {{ caisses.solde_entrees|floatformat:0 }} FCFA</p>
+                <p><strong>Sorties :</strong> {{ caisses.solde_sorties|floatformat:0 }} FCFA</p>
+                <p><strong>Solde actuel :</strong> {{ caisses.solde_courant|floatformat:0 }} FCFA</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="col-12">
+    <p>Aucune caisse disponible pour cet établissement cette année scolaire.</p>
+</div>
+{% endif %}
+
+</br>
+<hr>
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Suivi des <span class="text-danger">dépenses rattachées</span>
+</h6>
+
+{% if caisses %}
+<div class="d-flex gap-2 mb-3">
+    <a href="{% url 'ajouter_operation' caisses.id %}" class="btn btn-outline-success">
+        ➕ Ajouter une opération
+    </a>
+    <a href="{% url 'liste_operations_points' caisses.id %}" class="btn btn-outline-primary">
+        📌 Point de caisse
+    </a>
+    <a href="{% url 'liste_operations' caisses.id %}" class="btn btn-outline-dark">
+        📌 balance
+    </a>
+</div>
+{% endif %}
+
+</br>
+
+<table id="mesdepensesTable" class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Caisse</th>
+            <th>Motif</th>
+            <th>Montant (FCFA)</th>
+            <th>Statut Validation</th>
+            <th>Commentaire</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for operation in operations %}
+            <tr>
+                <td>{{ operation.date_operation|date:"d/m/Y" }}</td>
+                <td>{{ operation.caisse.nom }}</td>
+                <td>{{ operation.get_motif_display }}</td>
+                <td>{{ operation.montant|floatformat:0 }}</td>
+                <td>{{ operation.get_statut_validation_display }}</td>
+                <td>{{ operation.commentaire|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'modifier_operation' operation.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                    <!-- Bouton pour ouvrir le modal -->
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalSuppression{{ operation.id }}">
+                        Supprimer
+                    </button>
+
+                    <!-- Modal de confirmation -->
+                    <div class="modal fade" id="modalSuppression{{ operation.id }}" tabindex="-1" aria-labelledby="modalSuppressionLabel{{ operation.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="modalSuppressionLabel{{ operation.id }}">Confirmation de suppression</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            Voulez-vous vraiment supprimer cette opération ?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <form method="post" action="{% url 'supprimer_operation' operation.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                            </form>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+
+                </td>
+            </tr>
+        
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard_tresorerie' %}" class="btn btn-secondary mt-3">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#mesdepensesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Opérations PDF - {{ caisse.nom }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+        th { background-color: #ddd; }
+    </style>
+</head>
+<body>
+    <h2>Opérations de la caisse : {{ caisse.nom }}</h2>
+    <p>Période : {{ date_debut|default:"aujourd'hui" }} - {{ date_fin|default:"aujourd'hui" }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Motif</th>
+                <th class="text-success">Entrée (FCFA)</th>
+                <th class="text-danger">Sortie (FCFA)</th>
+                <th>Responsable</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for op in operations %}
+            <tr>
+                <td>{{ op.date_operation }}</td>
+                <td>{{ op.get_type_operation_display }}</td>
+                <td>{{ op.motif|default:"-" }}</td>
+                <td class="text-success">
+                    {% if op.type_operation == "entree" %}{{ op.montant }}{% endif %}
+                  </td>
+                  <td class="text-danger">
+                    {% if op.type_operation == "sortie" %}{{ op.montant }}{% endif %}
+                </td>
+                <td>{{ op.responsable }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

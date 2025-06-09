@@ -1,0 +1,64 @@
+{% extends 'base/base back.html' %}
+{% load static %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Liste des élèves <span class="text-danger">ayant abandonné – {{ annee }}</span>
+</h6>
+<hr></br>
+
+<div class="mb-3">
+    <a href="{% url 'export_eleves_inscrits_abandon_tous_excel' %}" class="btn btn-success">📊 Exporter Excel</a>
+    <a href="{% url 'export_eleves_inscrits_abandon_tous_pdf' %}" class="btn btn-danger">📄 Exporter PDF</a>
+</div>
+
+<table id="meselevesTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Établissement</th>
+            <th>Niveau</th>
+            <th>Classe</th>
+            <th>Nom</th>
+            <th>Prénoms</th>
+            <th>Total dû</th>
+            <th>Total payé</th>
+            <th>Restant</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inscription in inscriptions %}
+            <tr>
+                <td>{{ inscription.classe.etablissement.nom }}</td>
+                <td>{{ inscription.classe.niveau.nom }}</td>
+                <td>{{ inscription.classe.nom }}</td>
+                <td>{{ inscription.eleve.nom }}</td>
+                <td>{{ inscription.eleve.prenoms }}</td>
+                <td>{{ inscription.montant_total_du }}</td>
+                <td>{{ inscription.montant_total_paye }}</td>
+                <td>{{ inscription.solde_restant }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#meselevesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

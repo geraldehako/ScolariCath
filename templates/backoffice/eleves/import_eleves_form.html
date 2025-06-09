@@ -1,0 +1,33 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Importer depuis Excel <span class="text-danger">des élèves</span>
+    </h6>
+ 
+    <hr></br>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="fichier" accept=".xlsx,.xls" required>
+       
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Importer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

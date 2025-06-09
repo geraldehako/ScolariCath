@@ -1,0 +1,82 @@
+{% extends "base/base back.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Liste des postes <span class="text-danger">de service</span>
+    </h6>
+    <hr><br>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_poste' %}" class="btn btn-primary">+ Nouveau poste</a>
+    </div>
+
+    <table id="posteTable" class="display">
+        <thead>
+            <tr>
+                <th>Nom du poste</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for poste in postes %} 
+            <tr>
+                <td>{{ poste.nom }}</td>
+                <td class="text-center">
+                    <a href="{% url 'modifier_poste' poste.id %}" class="btn btn-sm btn-warning me-1">
+                        ✏️ Modifier
+                    </a>
+                    
+                    <!-- Bouton pour ouvrir le modal -->
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalSuppression{{ poste.id }}">
+                        🗑️ Supprimer
+                    </button>
+
+                    <!-- Modal de confirmation -->
+                    <div class="modal fade" id="modalSuppression{{ poste.id }}" tabindex="-1" aria-labelledby="modalSuppressionLabel{{ poste.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="modalSuppressionLabel{{ poste.id }}">Confirmer la suppression</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer le poste <strong>{{ poste.nom }}</strong> ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <a href="{% url 'supprimer_poste' poste.id %}" class="btn btn-danger">Oui, supprimer</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">Aucun poste enregistré.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- DataTables -->
+<script>
+    $(document).ready(function() {
+        $('#posteTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

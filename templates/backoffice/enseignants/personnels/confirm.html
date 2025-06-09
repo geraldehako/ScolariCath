@@ -1,0 +1,8 @@
+<h2>Supprimer le personnel</h2>
+<p>Es-tu sûr de vouloir supprimer <strong>{{ personnel.nom_complet }}</strong> ?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a href="{% url 'liste_personnels' %}" class="btn btn-secondary">Annuler</a>
+</form>

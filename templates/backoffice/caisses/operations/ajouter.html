@@ -1,0 +1,83 @@
+{% extends 'base/base back.html' %}
+{% load static %}
+ 
+{% block content %}
+<div class="container mt-4">
+    
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+  Nouvelle opération à la <span class="text-danger">{{ caisse.nom }}</span>
+</h6>
+ <hr><br>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            {% for field in form.visible_fields %}
+              <div class="col-md-6 mb-3" id="div_{{ field.auto_id }}">
+                <div class="form-group">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                  {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const typeOperationSelect = document.getElementById("id_type_operation");
+    const motifDiv = document.getElementById("div_id_motif");
+    const motifInput = document.getElementById("id_motif");
+
+    function toggleMotifVisibility() {
+      if (!typeOperationSelect || !motifDiv) return;
+      
+      if (typeOperationSelect.value === "sortie") {
+        motifDiv.style.display = "block";
+      } else {
+        motifDiv.style.display = "none";
+        if (motifInput) motifInput.value = "";  // Reset motif if not sortie
+      }
+    }
+
+    if (typeOperationSelect && motifDiv) {
+      typeOperationSelect.addEventListener("change", toggleMotifVisibility);
+      toggleMotifVisibility();  // appel au chargement
+    }
+  });
+</script>
+{% endblock %}

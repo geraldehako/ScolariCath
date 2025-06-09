@@ -1,0 +1,7 @@
+<h2>Résultat de l'importation</h2>
+<ul>
+    <li>Total de lignes lues : {{ total }}</li>
+    <li>Élèves créés : {{ crees }}</li>
+    <li>Élèves ignorés (matricule existant) : {{ ignores }}</li>
+</ul>
+<a href="{% url 'import_eleves' %}">Importer un autre fichier</a>

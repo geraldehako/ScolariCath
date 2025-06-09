@@ -1,0 +1,59 @@
+{% extends "base/base back.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Liste des postes <span class="text-danger">de service</span>
+    </h6>
+    <hr></br>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        
+        <a href="{% url 'creer_poste' %}" class="btn btn-primary">+ Nouveau poste</a>
+    </div>
+
+    <table id="posteTable" class="display">
+        <thead>
+            <tr>
+                <th>Nom du poste</th>
+                <th style="width: 180px;" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for poste in postes %}
+            <tr>
+                <td>{{ poste.nom }}</td>
+                <td class="text-center">
+                    <a href="{% url 'modifier_poste' poste.id %}" class="btn btn-sm btn-warning me-1">
+                        ✏️ Modifier
+                    </a>
+                    <a href="{% url 'supprimer_poste' poste.id %}" class="btn btn-sm btn-danger">
+                        🗑️ Supprimer
+                    </a>
+                </td>
+            </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Activation DataTables -->
+
+<script>
+    $(document).ready(function() {
+        $('#posteTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

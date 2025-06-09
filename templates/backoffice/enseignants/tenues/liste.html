@@ -1,0 +1,26 @@
+<h2>Tenues de classe</h2>
+<a href="{% url 'ajouter_tenue_classe' %}" class="btn btn-primary mb-3">Nouvelle tenue de classe</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Enseignant</th>
+            <th>Classe</th>
+            <th>Année scolaire</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tenue in tenues %}
+        <tr>
+            <td>{{ tenue.enseignant.nom_complet }}</td>
+            <td>{{ tenue.classe.nom }}</td>
+            <td>{{ tenue.annee_scolaire.libelle }}</td>
+            <td>
+                <a href="{% url 'modifier_tenue_classe' tenue.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'supprimer_tenue_classe' tenue.id %}" class="btn btn-sm btn-danger">Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

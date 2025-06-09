@@ -1,0 +1,155 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    📌 Suivi des caisses – <span class="text-danger">année scolaire {{ annee_active.libelle }}</span>
+</h6>
+<hr><br>
+
+
+<div class="table-responsive">
+    <table id="mescaissesTable" class="table table-bordered table-striped table-hover">
+        <thead class="table-primary text-center">
+            <tr>
+                <th>Établissement</th>
+                <th>Nom</th>
+                <th>Solde initial</th>
+                <th>Solde courant</th>
+                <th>Date création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for caisse in caisses %}
+                <tr>
+                    <td>{{ caisse.etablissement.nom }}</td>
+                    <td>{{ caisse.nom }}</td>
+                    <td>{{ caisse.solde_initial|floatformat:0 }} FCFA</td>
+                    <td>{{ caisse.solde_courant|floatformat:0 }} FCFA</td>
+                    <td>{{ caisse.date_creation|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'detail_caisse' caisse.pk %}" class="btn btn-outline-primary btn-sm" title="Détail">👁️ Détail</a>
+                        <a href="{% url 'liste_depenses_caisse' caisse.pk %}" class="btn btn-outline-secondary btn-sm" title="Dépenses">📄 Dépenses</a>
+                        
+                        <!-- Bouton déclencheur du modal -->
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalDotation{{ caisse.pk }}">
+                            💵 Ajouter une dotation
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="modalDotation{{ caisse.pk }}" tabindex="-1" aria-labelledby="modalLabel{{ caisse.pk }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form id="formDotation{{ caisse.pk }}" class="formDotation" data-url="{% url 'enregistrer_dotation' caisse.pk %}">
+                                    {% csrf_token %}
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalLabel{{ caisse.pk }}">Dotation de fonctionnement</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <label for="montant" class="form-label">Montant</label>
+                                            <input type="number" class="form-control" name="montant" min="1" required>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-primary">Confirmer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Aucune caisse pour cet établissement cette année scolaire.</td>
+                </tr>
+                {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'dashboard_tresorerie' %}" class="btn btn-secondary mt-3">← Retour au tableau de bord</a>
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Voulez-vous vraiment enregistrer cette dotation ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" id="confirmSubmitBtn" class="btn btn-primary">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DataTables script -->
+<script>
+    $(document).ready(function() {
+        $('#mescaissesTable').DataTable({
+            "language": {
+                "search": "🔍 Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            },
+            "order": [[ 4, "desc" ]] // Trie par date de création descendante
+        });
+    });
+</script>
+<!-- JS Ajax -->
+<script>
+let currentForm = null;
+
+document.querySelectorAll('.formDotation').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        currentForm = this; // on garde en mémoire le formulaire soumis
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        confirmModal.show(); // affichage du modal
+    });
+});
+
+// Lorsqu'on clique sur "Confirmer" dans le modal
+document.getElementById('confirmSubmitBtn').addEventListener('click', function () {
+    if (!currentForm) return;
+
+    const url = currentForm.dataset.url;
+    const data = new FormData(currentForm);
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: data
+    })
+    .then(response => response.json())
+    .then(json => {
+        if (json.success) {
+            alert("Dotation enregistrée !");
+            location.reload();
+        } else {
+            alert("Erreur : " + (json.error || "Inconnue"));
+        }
+    })
+    .catch(() => alert("Une erreur est survenue."));
+
+    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+    confirmModal.hide();
+});
+</script>
+
+
+{% endblock %}

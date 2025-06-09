@@ -1,0 +1,70 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        👩‍🏫 Liste du personnel <span class="text-danger">enseignant</span>
+    </h6>
+    <hr><br>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_personnel_adjoint' %}" class="btn btn-primary">
+            <i class="typcn typcn-plus"></i> Ajouter un personnel
+        </a>
+    </div>
+
+    <table id="personnelTable"  class="display">
+        <thead>
+            <tr>
+                <th>Nom complet</th>
+                <th>Poste</th>
+                <th>Établissement</th>
+                <th>Date d'embauche</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for personnel in personnels %}
+            <tr>
+                <td>{{ personnel.nom_complet }}</td>
+                <td>{{ personnel.poste.nom }}</td>
+                <td>{{ personnel.etablissement.nom }}</td>
+                <td>{{ personnel.date_embauche|date:"d/m/Y" }}</td>
+                <td>
+                    {% if personnel.statut == 'actif' %}
+                        <span class="badge bg-success">Actif</span>
+                    {% elif personnel.statut == 'inactif' %}
+                        <span class="badge bg-secondary">Inactif</span>
+                    {% else %}
+                        <span class="badge bg-light text-dark">{{ personnel.statut }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'modifier_personnel_adjoint' personnel.pk %}" class="btn btn-sm btn-warning">✏️ Modifier</a>
+                    <a href="{% url 'supprimer_personnel' personnel.pk %}" class="btn btn-sm btn-danger">🗑️ Supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Activation DataTables -->
+
+<script>
+    $(document).ready(function() {
+        $('#personnelTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+<h2>Liste des affectations</h2>
+<a href="{% url 'ajouter_affectation' %}" class="btn btn-primary mb-3">Nouvelle affectation</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Enseignant</th>
+            <th>Matière</th>
+            <th>Classe</th>
+            <th>Année scolaire</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for affectation in affectations %}
+        <tr>
+            <td>{{ affectation.enseignant.nom_complet }}</td>
+            <td>{{ affectation.matiere.nom }}</td>
+            <td>{{ affectation.classe.nom }}</td>
+            <td>{{ affectation.annee_scolaire.libelle }}</td>
+            <td>
+                <a href="{% url 'modifier_affectation' affectation.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'supprimer_affectation' affectation.id %}" class="btn btn-sm btn-danger">Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

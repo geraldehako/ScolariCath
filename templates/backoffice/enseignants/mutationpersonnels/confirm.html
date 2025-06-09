@@ -1,0 +1,8 @@
+<h2>Confirmer la suppression</h2>
+<p>Voulez-vous vraiment supprimer la mutation de {{ mutation.personnel.nom_complet }} ?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a href="{% url 'liste_mutations' %}" class="btn btn-secondary">Annuler</a>
+</form>
