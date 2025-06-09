@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+       Ajouter un emploi du temps pour la classe <span class="text-danger">{{ classe.nom }}</span>
+    </h6>
+    <hr><br>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_jour" class="form-label">Jour</label>
+                {{ form.jour }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_heure_debut" class="form-label">Heure de début</label>
+                {{ form.heure_debut }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_heure_fin" class="form-label">Heure de fin</label>
+                {{ form.heure_fin }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_matiere" class="form-label">Matière</label>
+                {{ form.matiere }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_tennant" class="form-label">Tenue de Classe</label>
+                {{ form.tennant }}
+            </div>
+        </div>
+
+
+        <input type="hidden" name="classe" value="{{ classe.id }}">
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

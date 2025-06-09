@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+     <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Liste des <span class="text-danger">arriérès de scolarité</span>
+    </h6>
+    <hr><br>
+    
+        <div class="mb-3">
+            <a href="{% url 'export_paiements_arrieres_excel' %}" class="btn btn-success mt-3">Exporter en Excel</a>
+            <a href="{% url 'export_paiements_arrieres_pdf' %}" class="btn btn-danger mt-3">Exporter en PDF</a>
+        </div>
+        <table id="paiementsTable" class="display">
+            <thead>
+                <tr>
+                    <th>Élève</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                    <th>Mode de paiement</th>
+                    <th>Échéance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                <tr>
+                    <td>{{ paiement.inscription.eleve.nom }} {{ paiement.inscription.eleve.prenoms }}</td>
+                    <td>{{ paiement.montant }} FCFA</td>
+                    <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+                    <td>{{ paiement.get_mode_paiement_display }}</td>
+                    <td>{{ paiement.echeance.modalite.nom }} - {{ paiement.echeance.nom }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>   
+
+    
+    <script>
+        $(document).ready(function() {
+            $('#paiementsTable').DataTable({
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ entrées",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

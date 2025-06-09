@@ -1,0 +1,188 @@
+{% extends 'base/base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<div class="container mt-4">
+     
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Paiement transport – <span class="text-danger">{{ inscription.eleve.nom }} {{ inscription.eleve.prenoms }}</span>
+    </h6>
+ 
+    <hr></br>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total dû</h5>
+                    <p class="card-text fs-5" id="total-du">{{ total_du }} FCFA</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Solde restant</h5>
+                    <p class="card-text fs-5" id="solde-restant">{{ solde }} FCFA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm" id="paiement-form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">{{ form.mode_paiement.label }}</label>
+                {{ form.mode_paiement }}
+            </div>
+
+            <div class="col-md-4 mb-3" id="numero-transaction-group">
+                <label class="form-label">{{ form.numero_transaction.label }}</label>
+                {{ form.numero_transaction }}
+                {% if form.numero_transaction.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.numero_transaction.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">{{ form.justificatif.label }}</label>
+                {{ form.justificatif }}
+            </div>
+        </div>
+
+        <hr>
+        <h5 class="mb-3">Échéances à payer</h5>
+        <div class="mb-4">
+            {% for modalite, field_name in form.relance_fields %}
+                {% with champ=form|get_item:field_name %}
+                    <div class="form-check mb-2">
+                        {{ champ }}
+                        <label class="form-check-label" for="{{ champ.id_for_label }}">
+                            {{ champ.label|safe }}
+                        </label>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+        </div> 
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title" id="confirmationModalLabel">Confirmation de paiement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modal-message">Message de confirmation</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" id="modal-confirm-btn">Continuer</button>
+        </div>
+      </div>
+    </div>
+</div> 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("paiement-form");
+        const totalPayeInitial = parseInt(document.getElementById("total-paye").textContent) || 0;
+        const totalDu = parseInt(document.getElementById("total-du").textContent) || 0;
+        const soldeRestantElement = document.getElementById("solde-restant");
+
+        const modePaiement = document.getElementById('id_mode_paiement');
+        const numeroTransactionGroup = document.getElementById('numero-transaction-group');
+        const numeroTransactionInput = document.getElementById('id_numero_transaction');
+
+        const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+
+        let paiementTotal = 0;
+
+        function toggleNumeroTransaction() {
+            if (modePaiement.value === 'virement') {
+                numeroTransactionGroup.style.display = 'block';
+            } else {
+                numeroTransactionGroup.style.display = 'none';
+                numeroTransactionInput.value = '';
+            }
+        }
+
+        toggleNumeroTransaction();
+        modePaiement.addEventListener('change', toggleNumeroTransaction);
+
+        function updateSolde() {
+            let totalSaisi = 0;
+            document.querySelectorAll("input[type='checkbox']:checked").forEach(checkbox => {
+                const montant = parseInt(checkbox.labels[0].textContent.match(/(\d+)/)[0]);
+                if (!isNaN(montant)) {
+                    totalSaisi += montant;
+                }
+            });
+
+            const nouveauTotal = totalPayeInitial + totalSaisi;
+            const nouveauSolde = totalDu - nouveauTotal;
+            soldeRestantElement.textContent = nouveauSolde >= 0 ? nouveauSolde : 0;
+        }
+
+        document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+            checkbox.addEventListener("change", updateSolde);
+        });
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+            if (checkboxes.length === 0) {
+                alert("Veuillez cocher au moins une modalité à payer.");
+                return;
+            }
+
+            let totalSaisi = 0;
+            checkboxes.forEach(checkbox => {
+                const montant = parseInt(checkbox.labels[0].textContent.match(/(\d+)/)[0]);
+                if (!isNaN(montant)) {
+                    totalSaisi += montant;
+                }
+            });
+
+            if (modePaiement.value === 'virement') {
+                const numero = numeroTransactionInput.value.trim();
+                if (!numero) {
+                    modalMessage.textContent = "Veuillez renseigner le numéro de transaction pour un paiement par virement.";
+                    modalConfirmBtn.style.display = "none";
+                    modal.show();
+                    return;
+                }
+            }
+
+            paiementTotal = totalSaisi;
+            modalMessage.textContent = `Vous allez enregistrer un paiement de ${paiementTotal} FCFA. Voulez-vous continuer ?`;
+            modalConfirmBtn.style.display = "inline-block";
+            modal.show();
+        });
+
+        modalConfirmBtn.addEventListener("click", function () {
+            modal.hide();
+            form.submit();
+        });
+    });
+</script>
+
+{% endblock %}

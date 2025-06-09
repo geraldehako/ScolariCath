@@ -1,0 +1,87 @@
+{% load myfront_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 30px;
+        }
+        h1, h3 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        h1 {
+            text-transform: uppercase;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+        p.entete {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 2px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        tr:nth-child(even) td {
+            background-color: #fafafa;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 10px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ etablissement.logo.url }}" alt="Logo" style="height: 60px; float: left;">
+
+    <h1>STATISTIQUES ANNUELLES DES ÉLÈVES</h1>
+    <p class="entete"><strong>Établissement :</strong> {{ etablissement.nom }}</p>
+    <p class="entete"><strong>Année scolaire :</strong> {{ annee.libelle }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Niveau</th>
+                <th>Garçons</th>
+                <th>Filles</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for niveau in niveaux %}
+            <tr>
+                <td>{{ niveau.nom }}</td>
+                <td>{{ effectif_dict|get_dict:niveau.nom|get_nested_value:"M" }}</td>
+                <td>{{ effectif_dict|get_dict:niveau.nom|get_nested_value:"F" }}</td>
+                <td>
+                    {% with garcon=effectif_dict|get_dict:niveau.nom|get_nested_value:"M" fille=effectif_dict|get_dict:niveau.nom|get_nested_value:"F" %}
+                        {{ garcon|default:0|add:fille|default:0 }}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Document généré le {{ now|date:"d/m/Y" }}</p>
+        <p><em>Signature du chef d’établissement</em> : _______________________</p>
+    </div>
+</body>
+</html>

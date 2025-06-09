@@ -1,0 +1,69 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        📌 Relances non à jour <span class="text-danger">(au {{ aujourd_hui|date:"d/m/Y" }})</span>
+    </h6>
+    <hr><br>
+    <div class="mb-3">
+        <a href="{% url 'export_relances_classe_pdf' classe.id %}" class="btn btn-danger">📄 Exporter en PDF</a>
+        <a href="{% url 'export_relances_classe_excel' classe.id %}" class="btn btn-success">📊 Exporter en Excel</a>
+        <a href="{% url 'classes_avec_inscrits' %}" class="btn btn-secondary">↩ Retour</a>
+    </div>
+    {% if relances %}
+        <table id="relanceTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Élève</th>
+                    <th>Classe</th>
+                    <th>Échéance</th>
+                    <th>Montant</th>
+                    <th>Total versé</th>
+                    <th>Solde</th>
+                    <th>Date de relance</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for relance in relances %} 
+                    <tr>
+                        <td><a href="{% url 'detail_eleve'  relance.inscription.eleve.matricule %}">{{ relance.inscription.eleve.nom }} {{ relance.inscription.eleve.prenoms }}</a></td>
+                        <td>{{ relance.inscription.classe.nom }}</td>
+                        <td>{{ relance.echeance.nom }}</td>
+                        <td>{{ relance.echeance_montant }} FCFA</td>
+                        <td>{{ relance.total_verse }} FCFA</td>
+                        <td>{{ relance.total_solde }} FCFA</td>
+                        <td>{{ relance.date_relance|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge bg-danger">{{ relance.get_statut_display }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info">Aucune relance non soldée à ce jour.</div>
+    {% endif %}
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#relanceTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

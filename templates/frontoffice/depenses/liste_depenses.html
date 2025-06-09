@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<h1>Liste des Dépenses</h1>
+<a href="{% url 'ajouter_depense' %}">Ajouter une Dépense</a>
+<ul>
+  {% for depense in depenses %}
+    <li>
+      {{ depense.date_depense }} - {{ depense.get_motif_display }} - {{ depense.montant }} FCFA (Caisse: {{ depense.caisse.nom }})
+      <a href="{% url 'modifier_depense' depense.pk %}">Modifier</a> |
+      <a href="{% url 'supprimer_depense' depense.pk %}">Supprimer</a>
+    </li>
+  {% empty %}
+    <li>Aucune dépense enregistrée.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

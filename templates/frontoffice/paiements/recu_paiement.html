@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h2, h3 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
+        .summary { margin-top: 30px; }
+        .header { display: flex; align-items: center; justify-content: space-between; }
+        .header .info { text-align: left; }
+        .header img { max-height: 80px; }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête Établissement -->
+    
+    <div class="header" style="display: flex; align-items: center; gap: 20px;">
+        {% if logo_path %}
+            <img src="{{ logo_path }}" alt="Logo" style="height: 60px;">
+        {% endif %}
+        <div class="info">
+            <h3>{{ etablissement.nom }}</h3>
+            <p><strong>Adresse :</strong> {{ etablissement.adresse }}</p>
+            <p><strong>Localisation :</strong> {{ etablissement.localisation }}</p>
+        </div>
+    </div>
+    
+
+    <h2>Reçu de Paiement</h2>
+
+    <p><strong>Élève :</strong> {{ eleve.nom }} {{ eleve.prenoms }} ({{ eleve.matricule }})</p>
+    <p><strong>Classe :</strong> {{ inscription.classe }}</p>
+    <p><strong>Année scolaire :</strong> {{ inscription.annee_scolaire }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Échéance</th>
+                <th>Mode</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ paiement.date_paiement }}</td>
+                <td>{{ paiement.montant }} FCFA</td>
+                <td>{{ paiement.echeance }}</td>
+                <td>{{ paiement.get_mode_paiement_display }}</td>
+                <td>{{ paiement.get_statut_validation_display }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <p><strong>Total payé :</strong> {{ inscription.montant_total_paye }} FCFA</p>
+        <p><strong>Total dû :</strong> {{ inscription.montant_total_du }} FCFA</p>
+        <p><strong>Solde restant :</strong> {{ inscription.solde_restant }} FCFA</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends 'base/base.html' %}
+{% block content %}
+ 
+
+
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Ajout de notes pour la classe <span class="text-danger">{{ classe.nom }}</span>
+    </h6>
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Matière : <span class="text-danger">{{ matiere.nom }}</span> | Période : <span class="text-danger">{{ periode.nom }}</span>
+    </h6>
+    <hr><br>
+    <div class="mb-3 text-end">
+      <a href="{% url 'voir_notes_classe' classe.id matiere.id periode.id %}" class="btn btn-info btn-sm">Voir</a>
+      <a href="{% url 'modifier_notes_classe' classe.id matiere.id periode.id %}" class="btn btn-warning btn-sm">Modifier</a>
+    </div>
+<form method="post">
+  {% csrf_token %}
+  <table class="table table-bordered table-sm">
+    <thead class="table-light">
+      <tr>
+        <th>Élève</th>
+        {% for i in range_5 %}
+          <th>Note {{ i|add:"1" }}</th>
+          <th>Type d'évaluation {{ i|add:"1" }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for eleve in eleves %}
+      <tr>
+        <td>{{ eleve.nom }} {{ eleve.prenoms }}</td>
+        {% for i in range_5 %}
+          <td>
+            <input type="number" step="0.01" name="note_{{ eleve.id }}_{{ i }}" class="form-control" placeholder="ex: 13.5">
+          </td>
+          <td>
+            <select name="type_{{ eleve.id }}_{{ i }}" class="form-control">
+              <option value="">-- Sélectionner --</option>
+              {% for type_eval in types_evaluation %}
+                <option value="{{ type_eval.id }}">{{ type_eval.libelle }} (/{{ type_eval.bareme }})</option>
+              {% endfor %}
+            </select>
+          </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  
+  <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer les notes
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+</form>
+{% endblock %}

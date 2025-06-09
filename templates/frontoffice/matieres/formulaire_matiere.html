@@ -1,0 +1,43 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+
+{% block content %}
+<div class="az-content-body">
+  
+  <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Nouvelle matière pour le cycle <span class="text-danger">{{ cycle.nom }}</span>
+  </h6>
+ 
+    <hr></br>
+
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="id_nom" class="form-label">Nom de la matière</label>
+          {{ form.nom }}
+          {{ form.nom.errors }}
+        </div>
+
+        
+
+         <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+      </form>
+    
+</div>
+{% endblock %}

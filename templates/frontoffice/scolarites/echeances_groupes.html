@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    
+     <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Échéancier des <span class="text-danger">frais de scolarité par niveau</span>
+    </h6>
+    <hr><br>
+    <div class="row">
+        {% for modalite, echeances in echeances_groupes.items %}
+            <div class="col-md-6 mb-4">
+                <div class="card border-{{ forloop.counter|add:1|divisibleby:"2"|yesno:"primary,success,info,warning,danger,secondary" }}">
+                    <div class="card-header bg-{{ forloop.counter|add:1|divisibleby:"2"|yesno:"primary,success,info,warning,danger,secondary" }} text-white">
+                        <h5 class="mb-0">{{ modalite.nom }}</h5>
+                        <small>{{ modalite.annee_scolaire.libelle }} – {{ modalite.etablissement.nom }} – {{ modalite.niveau.nom }}</small>
+                    </div>
+                    <div class="card-body">
+                        {% if echeances %}
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Montant</th>
+                                        <th>Date limite</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for echeance in echeances %}
+                                        <tr>
+                                            <td>{{ echeance.nom }}</td>
+                                            <td>{{ echeance.montant }} FCFA</td>
+                                            <td>{{ echeance.date_limite|date:"d/m/Y" }}</td>
+                                            <td>
+                                                <a href="" class="btn btn-sm btn-warning">✎ Modifier</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>Aucune échéance enregistrée pour cette modalité.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

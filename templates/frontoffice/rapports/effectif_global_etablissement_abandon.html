@@ -1,0 +1,69 @@
+
+{% extends 'base/base.html' %}
+{% load myfront_tags %}
+
+{% block content %}
+
+ <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        État des effectifs <span class="text-danger">abandons par niveau et par genre</span>
+    </h6>
+    <hr><br>
+<div class="mb-3">
+    <a href="{% url 'export_effectif_excel_etablissement_abandon' %}" class="btn btn-success mt-3">Exporter en Excel</a>
+    <a href="{% url 'export_effectif_pdf_etablissement_abandon' %}" class="btn btn-danger mt-3">Exporter en PDF</a>
+</div>
+
+<table class="table table-bordered table-striped" id="tableEffectif">
+    <thead>
+        <tr>
+            <th>Niveau</th>
+            <th>Garçons</th>
+            <th>Filles</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% with total_g=0 total_f=0 %}
+        {% for niveau in niveaux %}
+            {% with g=effectif_dict|get_item:niveau|get_item:"M" f=effectif_dict|get_item:niveau|get_item:"F" %}
+            <tr>
+                <td>{{ niveau }}</td>
+                <td>{{ g }}</td>
+                <td>{{ f }}</td>
+                <td>{{ g|add:f }}</td>
+            </tr>
+            {% endwith %}
+        {% endfor %}
+        {% endwith %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total général</th>
+            <td>{{ total_garcons }}</td>
+            <td>{{ total_filles }}</td>
+            <td>{{ total }}</td>
+        </tr>
+    </tfoot>
+    
+</table>
+
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#tableEffectif').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

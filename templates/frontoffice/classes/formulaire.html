@@ -1,0 +1,95 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+       Ajouter un emploi du temps pour la classe <span class="text-danger">{{ classe.nom }}</span>
+    </h6>
+    <hr><br>
+    <form method="post"> 
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_jour" class="form-label">Jour</label>
+                {{ form.jour }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_heure_debut" class="form-label">Heure de début</label>
+                {{ form.heure_debut }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_heure_fin" class="form-label">Heure de fin</label>
+                {{ form.heure_fin }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_matiere" class="form-label">Matière</label>
+                {{ form.matiere }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="id_professeur" class="form-label">Professeur</label>
+                {{ form.professeur }}
+            </div>
+        </div>
+
+
+        <!-- Classe est fixée dans la vue, inutile de l'afficher -->
+        <input type="hidden" name="classe" value="{{ classe.id }}">
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const matiereSelect = document.getElementById("id_matiere");
+    const professeurSelect = document.getElementById("id_professeur");
+
+    matiereSelect.addEventListener("change", function() {
+        const matiereId = this.value;
+
+        if (!matiereId) return;
+
+        fetch(`/get-professeurs/?matiere_id=${matiereId}`)
+            .then(response => response.json())
+            .then(data => {
+                professeurSelect.innerHTML = "";  // Clear existing options
+
+                if (data.professeurs.length === 0) {
+                    const option = document.createElement("option");
+                    option.text = "Aucun professeur disponible";
+                    option.disabled = true;
+                    option.selected = true;
+                    professeurSelect.appendChild(option);
+                } else {
+                    const defaultOption = document.createElement("option");
+                    defaultOption.text = "Sélectionnez un professeur";
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    professeurSelect.appendChild(defaultOption);
+
+                    data.professeurs.forEach(prof => {
+                        const option = document.createElement("option");
+                        option.value = prof.id;
+                        option.text = prof.nom;
+                        professeurSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Erreur lors du chargement des professeurs :", error);
+            });
+    });
+});
+</script>
+{% endblock %}

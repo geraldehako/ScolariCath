@@ -1,0 +1,33 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<h3>Paiements enregistrés - {{ annee_active.libelle }}</h3>
+<div class="mb-3">
+    <a href="{% url 'export_paiements_excel' %}" class="btn btn-success">Exporter en Excel</a>
+    <a href="{% url 'export_paiements_pdf' %}" class="btn btn-danger">Exporter en PDF</a>
+</div>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Élève</th>
+            <th>Montant</th>
+            <th>Mode</th>
+            <th>Statut</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for paiement in paiements %}
+            <tr>
+                <td>{{ paiement.inscription.eleve.nom }} {{ paiement.inscription.eleve.prenoms }}</td>
+                <td>{{ paiement.montant }} FCFA</td>
+                <td>{{ paiement.get_mode_paiement_display }}</td>
+                <td>{{ paiement.get_statut_validation_display }}</td>
+                <td>{{ paiement.date_paiement }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">Aucun paiement trouvé.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+{% endblock %}

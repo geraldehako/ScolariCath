@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="container">
+  <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Sélectionnez la matière et la période pour classe <span class="text-danger">{{ classe.nom }}</span>
+  </h6>
+ 
+  <hr></br>
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.matiere.label_tag }}
+          {{ form.matiere }}
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="form-group">
+          {{ form.periode.label_tag }}
+          {{ form.periode }}
+        </div>
+      </div>
+    </div>
+
+  
+    
+    <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-arrow-right"></i> Continuer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+      
+  </form>
+</div>
+{% endblock %}

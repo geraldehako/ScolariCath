@@ -1,0 +1,86 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Liste des élèves inscrits - <span class="text-danger">{{ etablissement.nom }} - {{ annee }}</span>
+</h6>
+<hr><br>
+<form method="POST" action="{% url 'muter_eleves' %}">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="nouvelle_classe" class="form-label">Nouvelle classe</label>
+        <select name="nouvelle_classe" id="nouvelle_classe" class="form-control" required>
+            <option value="">-- Choisir la classe de destination --</option>
+            {% for classe in classes_disponibles %}
+                <option value="{{ classe.id }}">{{ classe.niveau.nom }} - {{ classe.nom }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="motif" class="form-label">Motif de la mutation</label>
+        <textarea name="motif" class="form-control" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <a href="{% url 'export_eleves_inscrits_excel' %}" class="btn btn-success">📊 Exporter Excel</a>
+        <a href="{% url 'export_eleves_inscrits_pdf' %}" class="btn btn-danger">📄 Exporter PDF</a>
+        <button type="submit" class="btn btn-primary float-end">Muter les élèves sélectionnés</button>
+    </div>
+
+    <table id="meselevesTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Niveau</th>
+                <th>Classe</th>
+                <th>Nom</th>
+                <th>Prénoms</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscription in inscriptions %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="eleves_selectionnes" value="{{ inscription.eleve.id }}">
+                    </td>
+                    <td>{{ inscription.classe.niveau.nom }}</td>
+                    <td>{{ inscription.classe.nom }}</td>
+                    <td>{{ inscription.eleve.nom }}</td>
+                    <td>{{ inscription.eleve.prenoms }}</td>
+                    <td>{{ inscription.eleve.age }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">Aucun élève inscrit pour l'année en cours.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#meselevesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+ 

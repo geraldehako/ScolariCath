@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<h2>Liste des élèves</h2>
+
+<div class="mb-3">
+    <a href="{% url 'ajouter_eleve' %}" class="btn btn-success mb-3">➕ Ajouter un élève</a>
+    <a href="{% url 'import_eleves' %}" class="btn btn-danger mb-3">➕ Importer un élève</a>
+</div>
+
+<table id="meselevesTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Matricule</th><th>Nom</th><th>Prénoms</th><th>Sexe</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for eleve in eleves %}
+        <tr>
+            <td>{{ eleve.matricule }}</td>
+            <td>{{ eleve.nom }}</td>
+            <td>{{ eleve.prenoms }}</td>
+            <td>{{ eleve.get_sexe_display }}</td>
+            <td>
+                <a href="{% url 'modifier_eleve' eleve.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                <a href="{% url 'supprimer_eleve' eleve.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#meselevesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+ 

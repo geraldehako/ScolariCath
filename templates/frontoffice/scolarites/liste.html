@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>Liste des paiements</h2>
+        <table id="paiementsTable" class="display">
+            <thead>
+                <tr>
+                    <th>Élève</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                    <th>Mode de paiement</th>
+                    <th>Échéance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                <tr>
+                    <td>{{ paiement.inscription.eleve.nom_complet }}</td>
+                    <td>{{ paiement.montant }} FCFA</td>
+                    <td>{{ paiement.date|date:"d/m/Y" }}</td>
+                    <td>{{ paiement.get_mode_display }}</td>
+                    <td>{{ paiement.echeance.nom }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    
+    <script>
+        $(document).ready(function() {
+            $('#paiementsTable').DataTable({
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ entrées",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

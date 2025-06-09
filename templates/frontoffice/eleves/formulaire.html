@@ -1,0 +1,130 @@
+{% extends 'base/base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">{{ titre }}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Élève -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Informations de l'élève
+            </div>
+            <div class="card-body row g-3">
+                <div class="col-md-4">
+                    {{ form.matricule.label_tag }} {{ form.matricule }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.nom.label_tag }} {{ form.nom }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.prenoms.label_tag }} {{ form.prenoms }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.sexe.label_tag }} {{ form.sexe }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.date_naissance.label_tag }} {{ form.date_naissance }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.lieu_naissance.label_tag }} {{ form.lieu_naissance }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.photo.label_tag }} {{ form.photo }}
+                </div>
+                <div class="col-md-6 text-center">
+                    <img id="preview-photo" src="#" alt="Aperçu photo" style="max-height: 150px; display: none; margin-top: 10px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                Informations du parent
+            </div>
+            <div class="card-body row g-3">
+                {% if parent_partage %}
+                    <div class="col-12 alert alert-warning">
+                        ⚠️ Ce parent est déjà lié à un autre élève. Ses informations ne sont pas modifiables ici.
+                    </div>
+                {% endif %}
+                <div class="col-md-4">
+                    {{ form_parent.nom_complet.label_tag }} {{ form_parent.nom_complet }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_parent.telephone.label_tag }} {{ form_parent.telephone }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_parent.email.label_tag }} {{ form_parent.email }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Lien de parenté -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                Lien de parenté
+            </div>
+            <div class="card-body">
+                {{ formset.management_form }}
+                {% for form_parente in formset %}
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            {{ form_parente.lien.label_tag }} {{ form_parente.lien }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_parente.parent.label_tag }} {{ form_parente.parent }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Boutons -->
+        <div class="d-flex justify-content-between">
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- JS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% if parent_partage %}
+            const parentFields = document.querySelectorAll('[name^="nom_complet"], [name^="email"], [name^="telephone"]');
+            parentFields.forEach(field => field.setAttribute('readonly', true));
+        {% endif %}
+    });
+    </script>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("id_photo");
+        const preview = document.getElementById("preview-photo");
+    
+        if (input) {
+            input.addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                        preview.style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+    </script>
+    {% endblock %}
+    

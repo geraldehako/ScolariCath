@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+
+ <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        État scolarité des élèves <span class="text-danger">non affectés</span>
+    </h6>
+    <hr><br>
+<!-- Bouton d'ajout ou autre action -->
+<div class="mb-3">
+    <a href="{% url 'rapport_export_etatscolarite_classe_non_affecte_pdf' %}" class="btn btn-danger">📄 Exporter en PDF</a>
+    <a href="{% url 'rapport_export_etatscolarite_classe_non_affecte_excel' %}" class="btn btn-success">📊 Exporter en Excel</a>
+</div>
+
+<table id="relanceTable" class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Classe</th>
+            <th>Total Scolarité</th>
+            <th>Total Versé</th>
+            <th>Total Solde</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in resultats %}
+        <tr>
+            <td>{{ item.classe.nom }}</td>
+            <td>{{ item.total_echeance|default:"0" }}</td>
+            <td>{{ item.total_verse|default:"0" }}</td>
+            <td>{{ item.total_solde|default:"0" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    
+</table>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $(document).ready(function() {
+        $('#relanceTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'excelHtml5', className: 'btn btn-success', title: 'Relances par Etablissement' },
+                { extend: 'pdfHtml5', className: 'btn btn-danger', title: 'Relances par Etablissement' },
+                { extend: 'print', className: 'btn btn-info', title: 'Relances par Etablissement' }
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
+            }
+        });
+    });
+</script>
+{% endblock %}

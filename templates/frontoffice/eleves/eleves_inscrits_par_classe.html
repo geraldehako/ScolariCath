@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Élèves inscrits en <span class="text-danger">{{ classe.niveau.nom }} - {{ classe.nom }}</span>
+    </h6>
+    <hr><br>
+    <div class="text-end mb-3">
+        <a href="?export=pdf" class="btn btn-danger">Exporter en PDF</a>
+        <a href="?export=excel" class="btn btn-success">Exporter en Excel</a>
+      </div>
+      
+
+    <table id="table-eleves" class="display">
+        <thead>
+            <tr>
+                <th>Matricule</th>
+                <th>Nom</th>
+                <th>Prénoms</th>
+                <th>Date de naissance</th>
+                <th>Sexe</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscription in inscriptions %}
+                <tr>
+                    <td><a href="{% url 'detail_eleve' inscription.eleve.matricule %}">{{ inscription.eleve.matricule }}</a></td>
+                    <td>{{ inscription.eleve.nom }}</td>
+                    <td>{{ inscription.eleve.prenoms }}</td>
+                    <td>{{ inscription.eleve.date_naissance|date:"d/m/Y" }}</td>
+                    <td>{{ inscription.eleve.sexe }}</td>
+                </tr>
+            {% endfor %}
+        </tbody> 
+    </table>
+
+    <a href="{% url 'classes_avec_inscrits' %}" class="btn btn-secondary mt-3">← Retour aux classes</a>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $('#table-eleves').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

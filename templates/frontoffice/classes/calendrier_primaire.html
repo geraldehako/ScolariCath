@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Calendrier hebdomadaire – Classe <span class="text-danger">{{ classe.nom }}</span>
+    </h6>
+    <hr><br>
+    
+    {% if cycle.nom == 'Préscolaire' or cycle.nom == 'Primaire' %}
+        <a href="{% url 'creer_emploi_temps_primaire' classe.id %}" class="btn btn-primary mb-3">+ Ajouter une séance</a>
+    {% else %}
+        <a href="{% url 'creer_emploi_temps' classe.id %}" class="btn btn-primary mb-3">+ Ajouter une séance</a>
+    {% endif %}
+
+    <a href="{% url 'emploi_temps_pdf' classe.id %}" class="btn btn-outline-secondary mb-3" target="_blank">
+        🖨️ Imprimer en PDF
+    </a>
+    <a href="{% url 'classes_avec_inscrits' %}" class="btn btn-secondary mb-3">↩ Retour</a>
+
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Heure</th>
+                {% for jour in jours %}
+                    <th>{{ jour|capfirst }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for heure in heures %}
+                <tr>
+                    <td>{{ heure }}</td>
+                    {% for jour in jours %}
+                        <td>
+                            {% for emploi in emplois %}
+                                {% if emploi.jour == jour and emploi.heure_debut|time:"H:i" == heure %}
+                                    <div class="border p-1 bg-light">
+                                        <strong>{{ emploi.matiere.nom }}</strong><br>
+                                        {% if emploi.professeur %}
+                                            {{ emploi.professeur.nom_complet }}<br>
+                                        {% else %}
+                                            {{ emploi.tennant.enseignant.nom_complet }}<br>
+                                        {% endif %}
+
+                                        {{ emploi.heure_debut }} - {{ emploi.heure_fin }}
+                                        <br>
+                                        <a href="{% url 'supprimer_emploi' emploi.pk %}" class="btn btn-sm btn-outline-danger">🗑</a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

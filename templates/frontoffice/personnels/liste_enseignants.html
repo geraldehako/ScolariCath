@@ -1,0 +1,98 @@
+{% extends 'base/base.html' %}
+{% load extra_filters %}
+{% block content %} 
+<div class="container mt-4">
+  <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Liste des <span class="text-danger">Enseignants</span>
+    </h6>
+    <hr><br>
+    <div class="mb-3 text-end">
+        <a href="{% url 'creer_personnel_etablissement' %}" class="btn btn-primary">
+          <i class="bi bi-person-plus-fill"></i> Ajouter un enseignant
+        </a>
+    </div>
+    <div class="mb-3">
+        <a href="{% url 'export_enseignants_excel' %}" class="btn btn-success">📊 Exporter Excel</a>
+        <a href="{% url 'export_enseignants_pdf' %}" class="btn btn-danger">📄 Exporter PDF</a>
+    </div>
+    <table id="table-enseignants" class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Nom complet</th>
+            <th>Spécialité</th>
+            <th>Poste</th>
+            <th>Date d'embauche</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for enseignant in enseignants %}
+          <tr>
+            <td>{{ enseignant.nom_complet }}</td>
+            <td>
+              {{ classes_par_enseignant|dictkey:enseignant.id }}
+            </td>         
+            <td>{{ enseignant.poste.nom }}</td>
+            <td>{{ enseignant.date_embauche|date:"d/m/Y" }}</td>
+            <td>{{ enseignant.get_statut_display }}</td>
+            <td>
+              <a class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalTenue{{ enseignant.id }}">
+                <i class="bi bi-node-plus-fill"></i> Classe tenue
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+    <a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+</div>
+
+    
+    <script>
+        $(document).ready(function() {
+            $('#table-enseignants').DataTable({
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ entrées",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+    </script>
+    
+
+{% for enseignant in enseignants %}
+<div class="modal fade" id="modalTenue{{ enseignant.id }}" tabindex="-1" aria-labelledby="modalLabel{{ enseignant.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'ajouter_tenue_de_classe' enseignant.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel{{ enseignant.id }}">Ajouter Tenue de Classe - {{ enseignant.nom_complet }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          {{ formulaires_html|dictkey:enseignant.id|safe }}
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Enregistrer</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}

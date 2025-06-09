@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+
+ <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;"> 
+        Liste des élèves ayant obtenu <span class="text-danger">une remise – {{ etablissement.nom }} – {{ annee }}</span>
+    </h6>
+    <hr><br>
+
+    <div class="mb-3">
+        <a href="{% url 'export_eleves_inscrits_reduction_excel' %}" class="btn btn-success">📊 Exporter Excel</a>
+        <a href="{% url 'export_eleves_inscrits_reduction_pdf' %}" class="btn btn-danger">📄 Exporter PDF</a>
+    </div>
+
+    <table id="meselevesTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Niveau</th>
+                <th>Classe</th>
+                <th>Nom</th>
+                <th>Prénoms</th>
+                <th>Remise</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscription in inscriptions %}
+                <tr>
+                    <td>{{ inscription.classe.niveau.nom }}</td>
+                    <td>{{ inscription.classe.nom }}</td>
+                    <td>{{ inscription.eleve.nom }}</td>
+                    <td>{{ inscription.eleve.prenoms }}</td>
+                    <td>{{ inscription.reduction}} F</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#meselevesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+ 

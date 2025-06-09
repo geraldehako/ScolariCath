@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Emploi du temps – {{ classe.nom }}</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+        th { background-color: #eee; }
+        h2, h4 { text-align: center; }
+    </style>
+</head>
+<body>
+    <h2>Emploi du temps</h2>
+    {% if etablissement.logo %}
+        <div style="text-align: center; margin-bottom: 10px;">
+            <img src="{{ etablissement.logo.url }}" alt="Logo" height="80">
+        </div>
+    {% endif %}
+
+    <h4>{{ classe.nom }} – {{ etablissement.nom }}</h4>
+    <p style="text-align: center;">Année scolaire : {{ annee.libelle }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Heure</th>
+                {% for jour in jours %}
+                    <th>{{ jour|capfirst }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for heure in heures %}
+                <tr>
+                    <td>{{ heure }}</td>
+                    {% for jour in jours %}
+                        <td>
+                            {% for emploi in emplois %}
+                                {% if emploi.jour == jour and emploi.heure_debut|time:"H:i" == heure %}
+                                    <div>
+                                        <strong>{{ emploi.matiere.nom }}</strong><br>
+                                        
+                                        {% if emploi.professeur %}
+                                            {{ emploi.professeur.nom_complet }}<br>
+                                        {% else %}
+                                            {{ emploi.tennant.enseignant.nom_complet }}<br>
+                                        {% endif %}
+                                        {{ emploi.heure_debut }} - {{ emploi.heure_fin }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div style="margin-top: 60px; width: 100%; display: flex; justify-content: space-between;">
+        <div>
+            <p>Fait à {{ etablissement.localisation }}, le {{ now|date:"d/m/Y" }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p><strong>Le Directeur</strong></p>
+            <br><br>
+            <p>                                   </p>
+        </div>
+    </div>
+    
+</body>
+</html>

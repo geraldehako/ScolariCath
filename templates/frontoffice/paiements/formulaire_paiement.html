@@ -1,0 +1,227 @@
+{% extends 'base/base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Paiement des échéances de scolarité – <span class="text-danger">{{ inscription.eleve.nom }} {{ inscription.eleve.prenoms }}</span>
+    </h6>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total dû</h5>
+                    <p class="card-text fs-5" id="total-du">{{ total_du }} FCFA</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Déjà payé</h5>
+                    <p class="card-text fs-5" id="total-paye">{{ total_paye }} FCFA</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Solde restant</h5>
+                    <p class="card-text fs-5" id="solde-restant">{{ solde }} FCFA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="mb-3">
+                    <label class="form-label">{{ form.mode_paiement.label }}</label>
+                    {{ form.mode_paiement }}
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3" id="numero-transaction-group">
+                <div class="mb-3">
+                    <label for="id_numero_transaction" class="form-label">{{ form.numero_transaction.label }}</label>
+                    {{ form.numero_transaction }}
+                    {% if form.numero_transaction.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.numero_transaction.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="mb-3">
+                    <label class="form-label">{{ form.justificatif.label }}</label>
+                    {{ form.justificatif }}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h5 class="mb-3">Détails des échéances</h5>
+        {% for relance, field_name in form.relance_fields %}
+            {% with champ=form|get_item:field_name %}
+                <div class="mb-4">
+                    <label class="form-label">
+                        {{ champ.label|safe }}
+                    </label>
+                    <div class="input-group">
+                        {{ champ }}
+                        {% if champ.field.widget.attrs.readonly %}
+                            <span class="input-group-text bg-light text-muted">Échéance soldée</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form> 
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmation de paiement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-message">Message de confirmation</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="modal-confirm-btn">Continuer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const totalPayeInitial = parseInt(document.getElementById("total-paye").textContent) || 0;
+        const totalDu = parseInt(document.getElementById("total-du").textContent) || 0;
+        const soldeRestantElement = document.getElementById("solde-restant");
+
+        const modePaiement = document.getElementById('id_mode_paiement');
+        const numeroTransactionGroup = document.getElementById('numero-transaction-group');
+        const numeroTransactionInput = document.getElementById('id_numero_transaction');
+
+        function toggleNumeroTransaction() {
+            if (modePaiement.value === 'virement') {
+                numeroTransactionGroup.style.display = 'block';
+            } else {
+                numeroTransactionGroup.style.display = 'none';
+                numeroTransactionInput.value = '';
+            }
+        }
+
+        toggleNumeroTransaction();
+        modePaiement.addEventListener('change', toggleNumeroTransaction);
+
+        function updateSolde() {
+            let totalSaisi = 0;
+            document.querySelectorAll("input[type='number']").forEach(input => {
+                const val = parseInt(input.value);
+                if (!isNaN(val)) {
+                    totalSaisi += val;
+                }
+            });
+
+            const nouveauTotal = totalPayeInitial + totalSaisi;
+            const nouveauSolde = totalDu - nouveauTotal;
+            soldeRestantElement.textContent = nouveauSolde >= 0 ? nouveauSolde : 0;
+        }
+
+        document.querySelectorAll("input[type='number']").forEach(input => {
+            input.addEventListener("input", updateSolde);
+        });
+
+        const form = document.querySelector("form");
+        let paiementData = null;
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const totalSaisi = Array.from(document.querySelectorAll("input[type='number']"))
+                .map(input => parseInt(input.value) || 0)
+                .reduce((acc, val) => acc + val, 0);
+
+            if (totalSaisi <= 0) {
+                showModalMessage("Veuillez saisir au moins un montant supérieur à 0 pour continuer.");
+                return;
+            }
+
+            if (modePaiement.value === 'virement') {
+                const numero = numeroTransactionInput.value.trim();
+                if (!numero) {
+                    showModalMessage("Veuillez renseigner le numéro de transaction pour un paiement par virement.");
+                    return;
+                }
+            }
+
+            paiementData = {
+                mode: modePaiement.value,
+                montant: totalSaisi
+            };
+
+            showModalMessage(`Vous allez enregistrer un paiement total de ${totalSaisi} FCFA. Voulez-vous continuer ?`, true);
+        });
+
+        function showModalMessage(message, withConfirm = false) {
+            const modalMessage = document.getElementById("modal-message");
+            const confirmBtn = document.getElementById("modal-confirm-btn");
+
+            modalMessage.textContent = message;
+            confirmBtn.style.display = withConfirm ? "inline-block" : "none";
+
+            const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
+            modal.show();
+
+            confirmBtn.onclick = async function () {
+                const { mode, montant } = paiementData;
+
+                if (mode === "mobile_money") {
+                    try {
+                        const response = await fetch("{% url 'init_cinetpay' %}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": "{{ csrf_token }}",
+                            },
+                            body: JSON.stringify({
+                                inscription_id: "{{ inscription.id }}",
+                                montant: montant,
+                            }),
+                        });
+
+                        const data = await response.json();
+                        if (data.url) {
+                            window.location.href = data.url;
+                        } else {
+                            showModalMessage("Une erreur est survenue lors de l'initialisation du paiement CinetPay.");
+                        }
+                    } catch (err) {
+                        showModalMessage("Erreur réseau : " + err.message);
+                    }
+                } else {
+                    form.submit();
+                }
+            };
+        }
+    });
+</script>
+{% endblock %}

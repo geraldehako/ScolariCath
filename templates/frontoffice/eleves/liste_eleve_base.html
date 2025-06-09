@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        <span class="text-danger">La liste des élèves inscrits au moins une fois dans l’établissement</span>
+    </h6>
+    <hr><br>
+
+<table id="meselevesTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Matriculee</th><th>Nom</th><th>Prénoms</th><th>Sexe</th><th>Date naissance</th><th>Age</th> 
+        </tr>
+    </thead>
+    <tbody>
+        {% for eleve in eleves %}
+        <tr>
+            <td><a href="{% url 'detail_eleve' eleve.matricule %}">{{ eleve.matricule }}</a></td>
+            <td>{{ eleve.nom }}</td>
+            <td>{{ eleve.prenoms }}</td>
+            <td>{{ eleve.get_sexe_display }}</td>
+            <td>{{ eleve.date_naissance }}</td>
+            <td>{{ eleve.age }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">← Retour au tableau de bord</a>
+
+<script>
+    $(document).ready(function() {
+        $('#meselevesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+ 
