@@ -1,0 +1,228 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Tableau de bord - Établissement{% endblock %} 
+
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Bienvenue, <span class="text-danger">{{ request.user.last_name }} {{ request.user.first_name }}</span>
+    </h6>
+    <hr></br>
+
+    <!-- Statistiques principales -->
+    <div class="row text-center mb-4">
+        <div class="col">
+            <strong>Total élèves inscrits :</strong> {{ total_inscrits }}
+        </div>
+        <div class="col">
+            <strong>Garçons :</strong> {{ total_garcons }}
+        </div>
+        <div class="col">
+            <strong>Filles :</strong> {{ total_filles }}
+        </div>
+        <div class="col">
+            <strong>Classes avec inscriptions :</strong> {{ classes_avec_inscrits }}
+        </div>
+        <div class="col">
+            <strong>Places restantes :</strong> {{ places_restantes }}
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mt-4">
+                <div class="card-header bg-danger text-white">Effectifs & Répartition</div>
+                <div class="card-body text-center">
+                    <canvas id="statistiquesChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-white">Répartition par sexe</div>
+                <div class="card-body text-center">
+                    <canvas id="chartSexe" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">    
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">Taux d’occupation</div>
+                <div class="card-body text-center">
+                    <canvas id="tauxOccupationChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">Répartition par niveau</div>
+                <div class="card-body text-center">
+                    <canvas id="chartNiveau" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Raccourcis de navigation -->
+    <div class="row mt-5">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Élèves</div>
+                <div class="card-body">
+                    <h5 class="card-title">Gérer les élèves</h5>
+                    <a href="{% url 'liste_eleves_inscrits' %}" class="btn btn-light btn-sm">Voir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Classes</div>
+                <div class="card-body">
+                    <h5 class="card-title">Consulter les classes</h5>
+                    <a href="{% url 'classes_avec_inscrits' %}" class="btn btn-light btn-sm">Voir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Enseignants</div>
+                <div class="card-body">
+                    <h5 class="card-title">Liste des enseignants</h5>
+                    <a href="{% url 'liste_enseignants' %}" class="btn btn-light btn-sm">Voir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Paiements</div>
+                <div class="card-body">
+                    <h5 class="card-title">Scolarité & paiements</h5>
+                    <a href="{% url 'liste_paiements_etablissement' %}" class="btn btn-light btn-sm">Voir</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dernières inscriptions -->
+    <hr>
+    <h4>📋 10 dernières inscriptions</h4>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Matricule</th>
+                <th>Nom complet</th>
+                <th>Sexe</th>
+                <th>Niveau</th>
+                <th>Classe</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ins in dernieres_inscriptions %}
+            <tr>
+                <td><a href="{% url 'detail_eleve' ins.eleve.matricule %}">{{ ins.eleve.matricule }}</a></td>
+                <td>{{ ins.eleve.nom }} {{ ins.eleve.prenoms }}</td>
+                <td>{{ ins.eleve.sexe }}</td>
+                <td>{{ ins.classe.niveau.nom }}</td>
+                <td>{{ ins.classe.nom }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Informations -->
+    <hr>
+    <div class="alert alert-info">
+        📢 Informations importantes à afficher ici (rappels, communications de la direction, etc.)
+    </div>
+</div>
+
+<!-- JS CHARTS -->
+<script>
+const ctxStatistiques = document.getElementById('statistiquesChart').getContext('2d');
+new Chart(ctxStatistiques, {
+    type: 'bar',
+    data: {
+        labels: ['Total inscrits', 'Garçons', 'Filles', 'Classes avec inscrits', 'Places restantes'],
+        datasets: [{
+            label: 'Statistiques',
+            data: [{{ total_inscrits }}, {{ total_garcons }}, {{ total_filles }}, {{ classes_avec_inscrits }}, {{ places_restantes }}],
+            backgroundColor: ['#007bff', '#17a2b8', '#dc3545', '#ffc107', '#6f42c1'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+    }
+});
+
+const ctxSexe = document.getElementById('chartSexe').getContext('2d');
+new Chart(ctxSexe, {
+    type: 'pie',
+    data: {
+        labels: ['Garçons', 'Filles'],
+        datasets: [{
+            data: [{{ garcons }}, {{ filles }}],
+            backgroundColor: ['#36A2EB', '#FF6384'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+const ctxOccupation = document.getElementById('tauxOccupationChart').getContext('2d');
+new Chart(ctxOccupation, {
+    type: 'doughnut',
+    data: {
+        labels: ['Occupées', 'Restantes'],
+        datasets: [{
+            data: [{{ taux_occupation }}, {{ taux_restant }}],
+            backgroundColor: ['#007bff', '#ffc107'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+
+const ctxNiveau = document.getElementById('chartNiveau').getContext('2d');
+new Chart(ctxNiveau, {
+    type: 'bar',
+    data: {
+        labels: {{ labels_niveaux|safe }},
+        datasets: [{
+            label: 'Nombre d’élèves',
+            data: {{ data_niveaux|safe }},
+            backgroundColor: 'rgba(40, 167, 69, 0.6)',
+            borderColor: 'rgba(40, 167, 69, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,291 @@
+{% extends 'base/base back admin.html' %}
+
+{% block title %}Tableau de bord - système{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Bienvenue, <span class="text-danger">{{ request.user.last_name }} {{ request.user.first_name }}</span>
+    </h6>
+    <hr></br>
+
+    <!-- Statistiques principales -->
+    <div class="row row-cols-1 row-cols-md-5 g-4 text-center">
+
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">📊 Total Inscrits</h5>
+                    <p class="mb-1"><strong>Total :</strong> {{ total_inscrits }}</p>
+                    <p class="mb-1"><strong>Primaire :</strong> {{ total_inscrits_primaire }}</p>
+                    <p><strong>Secondaire :</strong> {{ total_inscrits_secondaire }}</p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-info">👦 Garçons</h5>
+                    <p class="mb-1"><strong>Total :</strong> {{ total_garcons }}</p>
+                    <p class="mb-1"><strong>Primaire :</strong> {{ total_garcons_primaire }}</p>
+                    <p><strong>Secondaire :</strong> {{ total_garcons_secondaire }}</p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">👧 Filles</h5>
+                    <p class="mb-1"><strong>Total :</strong> {{ total_filles }}</p>
+                    <p class="mb-1"><strong>Primaire :</strong> {{ total_filles_primaire }}</p>
+                    <p><strong>Secondaire :</strong> {{ total_filles_secondaire }}</p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">🏫 Classes ouvertes</h5>
+                    <p class="mb-1"><strong>Total :</strong> {{ classes_avec_inscrits }}</p>
+                    <p class="mb-1"><strong>Primaire :</strong> {{ classes_avec_inscrits_primaire }}</p>
+                    <p><strong>Secondaire :</strong> {{ classes_avec_inscrits_secondaire }}</p>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-success">🪑 Places restantes</h5>
+                    <p class="mb-1"><strong>Total :</strong> {{ places_restantes }}</p>
+                    <p class="mb-1"><strong>Primaire :</strong> {{ total_places_primaire }}</p>
+                    <p><strong>Secondaire :</strong> {{ total_places_secondaire }}</p>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+    
+
+    <!-- Graphiques -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mt-4">
+                <div class="card-header bg-danger text-white">Effectifs & Répartition</div>
+                <div class="card-body text-center">
+                    <canvas id="statistiquesChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-white">Répartition par sexe</div>
+                <div class="card-body text-center">
+                    <canvas id="chartSexe" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">    
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">Taux d’occupation</div>
+                <div class="card-body text-center">
+                    <canvas id="tauxOccupationChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">Répartition par niveau</div>
+                <div class="card-body text-center">
+                    <canvas id="chartNiveau" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>  </br>  
+
+
+    <hr>
+    <h4 class="text-uppercase fw-bold text-muted mb-4">
+        Paiements validés du <span class="text-primary">{{ date|date:"d/m/Y" }}</span>
+    </h4>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <table id="paiementsTable" class="display">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Établissement</th>
+                        <th>Total payé aujourd’hui</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for etab, total in paiements_par_etab %}
+                    <tr>
+                        <td>{{ etab.nom }}</td>
+                        <td>{{ total}} FCFA</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-6">
+            <canvas id="paiementChart" width="600" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Informations -->
+    <hr>
+    <div class="alert alert-info">
+        📢 Informations importantes à afficher ici (rappels, communications de la direction, etc.)
+    </div>
+
+        
+</div>
+
+<!-- JS CHARTS -->
+<script>
+const ctxStatistiques = document.getElementById('statistiquesChart').getContext('2d');
+new Chart(ctxStatistiques, {
+    type: 'bar',
+    data: {
+        labels: ['Total inscrits', 'Garçons', 'Filles', 'Classes avec inscrits', 'Places restantes'],
+        datasets: [{
+            label: 'Statistiques',
+            data: [{{ total_inscrits }}, {{ total_garcons }}, {{ total_filles }}, {{ classes_avec_inscrits }}, {{ places_restantes }}],
+            backgroundColor: ['#007bff', '#17a2b8', '#dc3545', '#ffc107', '#6f42c1'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+    }
+});
+
+const ctxSexe = document.getElementById('chartSexe').getContext('2d');
+new Chart(ctxSexe, {
+    type: 'pie',
+    data: {
+        labels: ['Garçons', 'Filles'],
+        datasets: [{
+            data: [{{ garcons }}, {{ filles }}],
+            backgroundColor: ['#36A2EB', '#FF6384'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+const ctxOccupation = document.getElementById('tauxOccupationChart').getContext('2d');
+new Chart(ctxOccupation, {
+    type: 'doughnut',
+    data: {
+        labels: ['Occupées', 'Restantes'],
+        datasets: [{
+            data: [{{ taux_occupation }}, {{ taux_restant }}],
+            backgroundColor: ['#007bff', '#ffc107'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+
+const ctxNiveau = document.getElementById('chartNiveau').getContext('2d');
+new Chart(ctxNiveau, {
+    type: 'bar',
+    data: {
+        labels: {{ labels_niveaux|safe }},
+        datasets: [{
+            label: 'Nombre d’élèves',
+            data: {{ data_niveaux|safe }},
+            backgroundColor: 'rgba(40, 167, 69, 0.6)',
+            borderColor: 'rgba(40, 167, 69, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 }
+            }
+        }
+    }
+});
+</script>
+
+<script>
+    const ctx = document.getElementById('paiementChart').getContext('2d');
+    const paiementChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                label: 'Montant total (FCFA)',
+                data: {{ valeurs|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Total des paiements par établissement'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' FCFA';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#paiementsTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

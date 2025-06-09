@@ -1,0 +1,11 @@
+<h2>Créer l'inscription pour {{ eleve.nom }} {{ eleve.prenoms }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="statut">Statut de l'élève :</label>
+    <select name="statut">
+        <option value="affecte">Affecté</option>
+        <option value="non_affecte">Non Affecté</option>
+    </select>
+    <button type="submit">Créer l'inscription</button>
+</form>

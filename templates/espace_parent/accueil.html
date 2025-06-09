@@ -1,0 +1,40 @@
+{% extends "base/base parent.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Bienvenue dans votre espace parent</h2>
+    <p>Voici un aperçu des enfants associés à votre compte :</p>
+
+    <div class="row">
+        {% for enfant in enfants %}
+        <div class="col-md-6">
+            
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ enfant.nom }} {{ enfant.prenoms }}</h5>
+                
+                        {% with inscription=enfant.inscription_active %}
+                            {% if inscription %}
+                                <div class="text-center mb-3">
+                                    <p class="mb-1"><strong>Montant total :</strong> {{ inscription.montant_total_du|floatformat:0 }} FCFA</p>
+                                    <p class="mb-1"><strong>Montant payé :</strong> {{ inscription.montant_total_paye|floatformat:0 }} FCFA</p>
+                                    <p class="mb-1"><strong>Solde restant :</strong> {{ inscription.solde_restant|floatformat:0 }} FCFA</p>
+                                </div>
+                            {% else %}
+                                <p class="text-danger text-center">Aucune inscription active trouvée.</p>
+                            {% endif %}
+                        {% endwith %}
+                
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'detail_eleve_parent' enfant.matricule %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-person-lines-fill"></i> Fiche élève
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

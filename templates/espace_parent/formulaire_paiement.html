@@ -1,0 +1,39 @@
+{% extends "base/base parent.html" %}
+{% load form_extras %}
+
+{% block content %}
+<h2>Paiement des échéances pour {{ inscription.eleve.nom }} {{ inscription.eleve.prenoms }}</h2>
+
+<div class="alert alert-info">
+    <strong>Total dû :</strong> <span id="total-du">{{ total_du }}</span> FCFA<br>
+    <strong>Montant déjà payé :</strong> <span id="total-paye">{{ total_paye }}</span> FCFA<br>
+    <strong>Solde restant :</strong> <span id="solde-restant">{{ solde }}</span> FCFA
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.mode_paiement.label_tag }} {{ form.mode_paiement }}
+    </div>
+
+    {% for relance, field_name in form.relance_fields %}
+        {% with champ=form|get_item:field_name %}
+            <div class="form-group">
+                <label>
+                    {{ champ.label|safe }}
+                    <br>
+                    <small class="text-muted">
+                        Déjà payéd : {{ montants_payes|get_item:relance.echeance.id|default:0 }} FCFA
+                    </small>
+                </label>
+                {{ champ }}
+            </div>
+        {% endwith %}
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Enregistrer les paiements</button>
+</form>
+
+
+</script>
+{% endblock %}

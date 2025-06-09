@@ -1,0 +1,12 @@
+<!-- annee_scolaire_form.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h1>{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} une année scolaire</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enregistrer</button>
+  </form>
+  <a href="{% url 'annee_scolaire_list' %}">Retour à la liste des années scolaires</a>
+{% endblock %}

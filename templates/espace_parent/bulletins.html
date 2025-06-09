@@ -1,0 +1,50 @@
+{% extends "base/base parent.html" %}
+{% block content %}
+<h2 class="mb-4">Bulletins de vos enfants</h2>
+
+{% for item in data %}
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            {{ item.enfant.nom }} {{ item.enfant.prenoms }} – Matricule : {{ item.enfant.matricule }}
+        </div>
+        <div class="card-body">
+            {% if item.bulletins %}
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Année scolaire</th>
+                            <th>Trimestre/Période</th>
+                            <th>Moyenne</th>
+                            <th>Classe</th>
+                            <th>Rang</th>
+                            <th>Décision</th>
+                            <th>Télécharger</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bulletin in item.bulletins %}
+                            <tr>
+                                <td>{{ bulletin.annee_scolaire }}</td>
+                                <td>{{ bulletin.periode }}</td>
+                                <td>{{ bulletin.moyenne_generale|floatformat:2 }}</td>
+                                <td>{{ bulletin.classe.nom }}</td>
+                                <td>{{ bulletin.rang }}</td>
+                                <td>{{ bulletin.decision }}</td>
+                                <td>
+                                    <a href="{% url 'telecharger_bulletin_pdf' bulletin.id %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        PDF
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">Aucun bulletin disponible pour cet enfant.</p>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>Vous n’avez aucun enfant enregistré.</p>
+{% endfor %}
+{% endblock %}

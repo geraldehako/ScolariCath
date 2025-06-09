@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - ScolariCath</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS Bootstrap + custom -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <style>
+        body {
+            background: url("{% static 'images/cat.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            max-width: 420px;
+            margin: 80px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .corner-img {
+            position: absolute;
+            width: 70px;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .top-left { top: 10px; left: 10px; }
+        .top-right { top: 10px; right: 10px; }
+        .bottom-left { bottom: 10px; left: 10px; }
+        .bottom-right { bottom: 10px; right: 10px; }
+
+        .logo {
+            display: block;
+            margin: 0 auto 25px auto;
+            max-width: 260px;
+            height: auto;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Décorations -->
+    <img src="{% static 'images/deco2.jpeg' %}" class="corner-img top-left" alt="">
+    <img src="{% static 'images/deco2.png' %}" class="corner-img top-right" alt="">
+    <img src="{% static 'images/deco3.png' %}" class="corner-img bottom-left" alt="">
+    <img src="{% static 'images/deco4.png' %}" class="corner-img bottom-right" alt="">
+
+    <div class="login-container">
+        <img src="{% static 'images/logo.png' %}" alt="Logo de l'école" class="logo">
+
+        <h4 class="text-center mb-1 fw-semibold">Connexion au Portail Scolaire</h4>
+        <h6 class="text-center text-danger mb-4">ScolariCath</h6>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'auth' in message.tags %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        🔒 {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Nom d'utilisateur</label>
+                <input type="text" name="username" id="username" class="form-control" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Connexion</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS (optionnel pour alertes dismissibles) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

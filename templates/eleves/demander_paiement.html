@@ -1,0 +1,22 @@
+<h2>Demander un paiement de scolarité pour {{ inscription.eleve.nom }} {{ inscription.eleve.prenoms }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <label for="echeance">Choisissez l'échéance à payer :</label>
+    <select name="echeance" id="echeance">
+        {% for echeance in echeances_non_soldee %}
+            <option value="{{ echeance.id }}">{{ echeance.nom }} - {{ echeance.montant }} FCFA</option>
+        {% empty %}
+            <option disabled>Aucune échéance non soldée</option>
+        {% endfor %}
+    </select>
+    
+    <label for="paiement_effectue">Le paiement a-t-il été effectué ?</label>
+    <select name="paiement_effectue" id="paiement_effectue">
+        <option value="oui">Oui</option>
+        <option value="non">Non</option>
+    </select>
+    
+    <button type="submit">Confirmer le paiement</button>
+</form>

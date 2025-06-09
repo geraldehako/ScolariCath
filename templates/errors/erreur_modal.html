@@ -1,0 +1,30 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<!-- Modal Bootstrap -->
+<div class="modal fade show" style="display: block;" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Erreur</h5>
+      </div>
+      <div class="modal-body">
+        <p>{{ message }}</p>
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'dashboard_direction' %}" class="btn btn-secondary">Retour</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Force la page à afficher la modale immédiatement -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.querySelector('.modal');
+    if (modal) {
+      modal.classList.add('show');
+    }
+  });
+</script>
+{% endblock %}

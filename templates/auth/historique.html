@@ -1,0 +1,48 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        🔐 Liste des <span class="text-danger">historique d'accès</span>
+    </h6>
+    <hr><br>
+    <table id="accesTable" class="table table-bordered table-hover">
+        <thead class="table-primary text-center"> 
+            <tr>
+                <th>Type</th>
+                <th>Date/Heure</th>
+                <th>Adresse IP</th>
+                <th>Appareil/Navigateur</th>
+                <th>Utilisateur</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in historique %}
+            <tr>
+                <td>{{ h.type_evenement }}</td>
+                <td>{{ h.date_heure|date:"d/m/Y H:i" }}</td>
+                <td>{{ h.adresse_ip }}</td>
+                <td>{{ h.user_agent|truncatechars:100 }}</td>
+                <td>{{ h.utilisateur}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#accesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

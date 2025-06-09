@@ -1,0 +1,32 @@
+<!-- annee_scolaire_list.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h1>Liste des Années Scolaires</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Libellé</th>
+        <th>Date de Début</th>
+        <th>Date de Fin</th>
+        <th>Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for annee in annees_scolaires %}
+        <tr>
+          <td>{{ annee.libelle }}</td>
+          <td>{{ annee.date_debut }}</td>
+          <td>{{ annee.date_fin }}</td>
+          <td>{{ annee.active }}</td>
+          <td>
+            <a href="{% url 'update_annee_scolaire' annee.pk %}">Modifier</a>
+            <a href="{% url 'delete_annee_scolaire' annee.pk %}">Supprimer</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'create_annee_scolaire' %}">Ajouter une nouvelle année scolaire</a>
+{% endblock %}

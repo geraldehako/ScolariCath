@@ -1,0 +1,19 @@
+{% extends "base/base parent.html" %}
+{% block content %}
+<h3>Liste de vos enfants</h3>
+<div class="row">
+    {% for enfant in enfants %}
+    <div class="col-md-4">
+        <div class="card mb-3">
+            {% if enfant.photo %}
+            <img src="{{ enfant.photo.url }}" class="card-img-top" alt="Photo de l'élève">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ enfant.nom }} {{ enfant.prenoms }}</h5>
+                <a href="{% url 'detail_eleve_parent' enfant.matricule %}" class="btn btn-primary">Voir fiche</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

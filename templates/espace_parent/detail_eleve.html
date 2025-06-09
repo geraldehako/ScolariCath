@@ -1,0 +1,298 @@
+{% extends "base/base parent.html" %}
+{% load static %}
+{% block title %}Fiche élève{% endblock %}
+
+{% block content %}
+<div class="az-content az-content-profile">
+  <div class="container mn-ht-100p">
+    <div class="az-content-left az-content-left-profile">
+      <div class="az-profile-overview">
+        <div class="az-img-user">
+          {% if eleve.photo %}
+            <img src="{{ eleve.photo.url }}" alt="Photo élève" class="rounded-circle" width="100">
+          {% else %}
+            <img src="{% static '/images/logo.png' %}" alt="Photo élève" class="rounded-circle" width="100"> 
+          {% endif %}
+        </div>
+        <div class="d-flex justify-content-between mg-b-20 mt-2">
+          <div>
+            <h5 class="az-profile-name">{{ eleve.nom }} {{ eleve.prenoms }}</h5>
+            <p class="az-profile-name-text">Matricule : {{ eleve.matricule }}</p>
+          </div>
+        </div>
+        <div class="az-profile-bio">
+          Né(e) le {{ eleve.date_naissance }} | Sexe : {{ eleve.sexe }}
+        </div>
+
+        <hr class="mg-y-30">
+
+        <label class="az-content-label tx-13 mg-b-20">Parents</label>
+        <ul class="list-group">
+          {% for parent in parents %}
+            <li class="list-group-item">
+              <strong>{{ parent.lien }} :</strong> {{ parent.parent.nom_complet }}<br>
+              Tél : {{ parent.parent.telephone }}<br>
+              Email : {{ parent.parent.email }}
+            </li>
+          {% empty %}
+            <li class="list-group-item">Aucun parent renseigné.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div> 
+
+    </br>
+    <div class="az-content-body az-content-body-profile">
+      <nav class="nav az-nav-line">
+        <a class="nav-link active" data-bs-toggle="tab" href="#inscriptions">Inscriptions</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#paiements">Paiements</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#notes">Notes</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#planning">Emploi du temps</a>
+      </nav>
+
+      <div class="tab-content mt-4">
+        <div class="tab-pane fade show active" id="inscriptions">
+          <h5>Inscriptions</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr><th>Année scolaire</th><th>Classe</th><th>Réduction</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              {% for ins in inscriptions %}
+              <tr>
+                <td>{{ ins.annee_scolaire }}</td>
+                <td>{{ ins.classe.niveau.nom }} {{ ins.classe.nom }}</td>
+                <td>{{ ins.reduction }} FCFA</td>
+                <td>
+                  {% if ins %}
+                    <div class="d-flex flex-wrap gap-2">
+                      <a href="" class="btn btn-sm btn-primary">
+                        💼 Paiement Scolarité
+                      </a>
+                      <a href="" class="btn btn-sm btn-secondary">
+                        🚐 Paiement Transport
+                      </a>
+                      <a href="" class="btn btn-sm btn-warning">
+                        🍽️ Paiement Cantine
+                      </a>
+                    </div>
+                  {% endif %}
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane fade" id="paiements">
+          <ul class="nav nav-tabs mb-3" id="paiementTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="scolarite-tab" data-bs-toggle="tab" data-bs-target="#scolarite" type="button" role="tab">
+                💼 Scolarité
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="transport-tab" data-bs-toggle="tab" data-bs-target="#transport" type="button" role="tab">
+                🚐 Transport
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="cantine-tab" data-bs-toggle="tab" data-bs-target="#cantine" type="button" role="tab">
+                🍽️ Cantine
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Paiements scolarité -->
+            <div class="tab-pane fade show active" id="scolarite" role="tabpanel">
+              <h5>Paiements Scolarité</h5>
+              {% if inscription_active %}
+                <a href="" class="btn btn-primary mb-3">
+                  ➕ Ajouter un paiement
+                </a>
+              {% endif %}
+              <table id="ScolariteTable" class="table table-bordered table-striped">
+                <thead>
+                  <tr><th>Date</th><th>Montant</th><th>Échéance</th><th>Mode</th><th>Statut</th></tr>
+                </thead>
+                <tbody>
+                  {% for paiement in paiements %}
+                    <tr>
+                      <td>{{ paiement.date_paiement }}</td>
+                      <td>{{ paiement.montant }} FCFA</td>
+                      <td>{{ paiement.echeance }}</td>
+                      <td>{{ paiement.mode_paiement }}</td>
+                      <td>{{ paiement.statut_validation }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paiements transport -->
+            <div class="tab-pane fade" id="transport" role="tabpanel">
+              <h5>Paiements Transport</h5>
+              {% if inscription_active %}
+                <a href="" class="btn btn-secondary mb-3">
+                  ➕ Ajouter un paiement transport
+                </a>
+              {% endif %}
+              <table id="TransportTable" class="table table-bordered table-striped">
+                <thead>
+                  <tr><th>Date</th><th>Montant</th><th>Tranche</th><th>Mode</th><th>Statut</th></tr>
+                </thead>
+                <tbody>
+                  {% for paiement in paiements_transport %}
+                    <tr>
+                      <td>{{ paiement.date_paiement }}</td>
+                      <td>{{ paiement.montant }} FCFA</td>
+                      <td>{{ paiement.tranche }}</td>
+                      <td>{{ paiement.mode_paiement }}</td>
+                      <td>{{ paiement.statut_validation }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paiements cantine -->
+            <div class="tab-pane fade" id="cantine" role="tabpanel">
+              <h5>Paiements Cantine</h5>
+              {% if inscription_active %}
+                <a href="" class="btn btn-warning mb-3">
+                  ➕ Ajouter un paiement cantine
+                </a>
+              {% endif %}
+              <table id="CantineTable" class="table table-bordered table-striped">
+                <thead>
+                  <tr><th>Date</th><th>Montant</th><th>Tranche</th><th>Mode</th><th>Statut</th></tr>
+                </thead>
+                <tbody>
+                  {% for paiement in paiements_cantine %}
+                    <tr>
+                      <td>{{ paiement.date_paiement }}</td>
+                      <td>{{ paiement.montant }} FCFA</td>
+                      <td>{{ paiement.tranche }}</td>
+                      <td>{{ paiement.mode_paiement }}</td>
+                      <td>{{ paiement.statut_validation }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="notes">
+          <h5>Notes</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr><th>Matière</th><th>Note</th><th>Période</th></tr>
+            </thead>
+            <tbody>
+              {% for note in notes %}
+              <tr>
+                <td>{{ note.matiere.nom }}</td>
+                <td>{{ note.valeur }}</td>
+                <td>{{ note.periode.nom }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+ 
+        <div class="tab-pane fade" id="planning">
+          <h5>planning</h5>
+          <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Heure</th>
+                    {% for jour in jours %}
+                        <th>{{ jour|capfirst }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for heure in heures %}
+                    <tr>
+                        <td>{{ heure }}</td>
+                        {% for jour in jours %}
+                            <td>
+                                {% for emploi in emplois %}
+                                    {% if emploi.jour == jour and emploi.heure_debut|time:"H:i" == heure %}
+                                        <div class="border p-1 bg-light">
+                                            <strong>{{ emploi.matiere.nom }}</strong><br>
+                                            {{ emploi.professeur.nom_complet }}<br>
+                                            {{ emploi.heure_debut }} - {{ emploi.heure_fin }}
+                                            <br>
+                                            <a href="{% url 'modifier_emploi' emploi.pk %}" class="btn btn-sm btn-outline-warning mt-1">✎</a>
+                                            <a href="{% url 'supprimer_emploi' emploi.pk %}" class="btn btn-sm btn-outline-danger">🗑</a>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#ScolariteTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#TransportTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#CantineTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

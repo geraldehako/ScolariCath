@@ -1,0 +1,12 @@
+<!-- annee_scolaire_confirm_delete.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h1>Confirmer la suppression</h1>
+  <p>Êtes-vous sûr de vouloir supprimer l'année scolaire "{{ annee_scolaire.libelle }}" ?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Supprimer</button>
+  </form>
+  <a href="{% url 'annee_scolaire_list' %}">Annuler</a>
+{% endblock %}
