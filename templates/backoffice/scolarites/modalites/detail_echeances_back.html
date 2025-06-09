@@ -1,0 +1,46 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+   
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Échéances pour <span class="text-danger">{{ modalite.nom }} : {{ modalite.montant }} FCFA  – {{ modalite.etablissement.nom }} – {{ modalite.annee_scolaire.libelle }}</span>
+    </h6>
+ 
+    <hr></br>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Montant</th>
+                <th>Date limite</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for echeance in echeances %}
+                <tr>
+                    <td>{{ echeance.nom }}</td>
+                    <td>{{ echeance.montant }} FCFA</td>
+                    <td>{{ echeance.date_limite|date:"d/m/Y" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3" class="text-center">Aucune échéance définie.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </br></br>
+    <div class="d-flex justify-content-between mt-3">
+        <!-- Bouton à gauche -->
+        <a href="{% url 'liste_modalites_etablissement_back' modalite.etablissement.id %}" class="btn btn-secondary">
+            ← Retour
+        </a>
+    
+        <!-- Bouton à droite -->
+        <a href="{% url 'modifier_echeances_modalite' modalite.id %}" class="btn btn-success">
+            ✏️ Modifier les échéances
+        </a>
+    </div>
+    
+</div>
+{% endblock %}

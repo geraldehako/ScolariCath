@@ -1,0 +1,47 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        📅 Liste des <span class="text-danger">mois</span>
+    </h6>
+    <hr><br>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_mois' %}" class="btn btn-primary mb-3">➕ Ajouter un mois</a>
+    </div>
+    
+    <table id="moisTable" class="table table-bordered table-striped">
+        <thead>
+            <tr><th>Mois</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for m in mois_list %}
+            <tr>
+                <td>{{ m.mois }}</td>
+                <td>
+                    <a href="{% url 'modifier_mois' m.pk %}" class="btn btn-sm btn-warning">✏️ modifier</a>
+                    <a href="{% url 'supprimer_mois' m.pk %}" class="btn btn-sm btn-danger">🗑️ supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#moisTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

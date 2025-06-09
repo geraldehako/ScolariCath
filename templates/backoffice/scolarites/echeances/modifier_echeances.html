@@ -1,0 +1,84 @@
+{% extends "base/base back.html" %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Modifier les échéances pour la modalité <span class="text-danger">{{ modalite.nom }} - {{ modalite.etablissement }}</span>
+</h6>
+
+<hr><br>
+{% if erreur_montant %}
+  <div class="alert alert-danger">
+    {{ erreur_montant }}
+  </div>
+{% endif %}
+
+<form method="post" id="echeance-form">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Montant</th>
+                <th>Date limite</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+                <tr>
+                    {{ form.id }}  {# Affiche le champ id caché correctement #}
+                    <td>{{ form.nom }}</td>
+                    <td>{{ form.montant }}</td>
+                    <td>{{ form.date_limite }}</td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+ 
+    <p><strong>Montant total des échéances :</strong> <span id="total-montant">0</span> / {{ modalite.montant }} FCFA</p>
+    <p id="message-erreur" class="text-danger" style="display: none;">⚠️ Le total ne correspond pas au montant attendu.</p>
+
+    
+    <div class="mt-4 d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Enregistrer les modifications
+        </button>
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Annuler
+        </a>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const montantAttendu = {{ modalite.montant }};
+    const montantInputs = document.querySelectorAll('input[name$="-montant"]');
+    const totalSpan = document.getElementById('total-montant');
+    const messageErreur = document.getElementById('message-erreur');
+
+    function updateTotal() {
+        let total = 0;
+        montantInputs.forEach(input => {
+            const valeur = parseFloat(input.value) || 0;
+            total += valeur;
+        });
+        totalSpan.textContent = total.toFixed(2);
+
+        if (total !== montantAttendu) {
+            messageErreur.style.display = 'block';
+        } else {
+            messageErreur.style.display = 'none';
+        }
+    }
+
+    // Mise à jour initiale
+    updateTotal();
+
+    // Recalculer à chaque modification
+    montantInputs.forEach(input => {
+        input.addEventListener('input', updateTotal);
+    });
+});
+</script>
+{% endblock %}

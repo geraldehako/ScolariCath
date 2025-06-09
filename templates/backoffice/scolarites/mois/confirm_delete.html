@@ -1,0 +1,20 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        ⚠️ Supprimer le <span class="text-danger">mois "{{ objet }}"</span> ?
+    </h6>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-save"></i> Oui, supprimer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

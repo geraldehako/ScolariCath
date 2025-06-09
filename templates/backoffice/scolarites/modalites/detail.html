@@ -1,0 +1,36 @@
+
+{% block content %}
+<h2>Détail de la modalité : {{ modalite.nom }}</h2>
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><strong>Niveau :</strong> {{ modalite.niveau.nom }}</li>
+    <li class="list-group-item"><strong>Établissement :</strong> {{ modalite.etablissement.nom }}</li>
+    <li class="list-group-item"><strong>Année scolaire :</strong> {{ modalite.annee_scolaire.nom }}</li>
+    <li class="list-group-item"><strong>Applicable aux non affectés :</strong> {{ modalite.applicable_aux_non_affectes|yesno:"Oui,Non" }}</li>
+    <li class="list-group-item"><strong>Nombre d’échéances :</strong> {{ modalite.nombre_echeances }}</li>
+</ul>
+
+<h4>Échéances associées</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Montant</th>
+            <th>Date limite</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in echeances %}
+        <tr>
+            <td>{{ e.nom }}</td>
+            <td>{{ e.montant }}</td>
+            <td>{{ e.date_limite }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">Aucune échéance enregistrée.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'ajouter_echeance' modalite.id %}" class="btn btn-primary mb-3">Ajouter une échéance</a>
+<a href="{% url 'liste_modalites' %}" class="btn btn-secondary">Retour</a>
+{% endblock %}

@@ -1,0 +1,31 @@
+<h2>Liste des rôles</h2>
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<p><a href="{% url 'ajouter_role' %}">➕ Ajouter un rôle</a></p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Nom du rôle</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for role in roles %}
+        <tr>
+            <td>{{ role.nom }}</td>
+            <td>
+                <a href="{% url 'gerer_acces_role' role.id %}">Modifier les accès</a>
+                <a href="{% url 'modifier_role' role.id %}">✏️ Modifier</a> |
+                <a href="{% url 'supprimer_role' role.id %}">🗑️ Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

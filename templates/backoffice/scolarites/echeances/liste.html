@@ -1,0 +1,32 @@
+
+{% block content %}
+<h2>Liste des échéances</h2>
+<a href="{% url 'ajouter_echeance' %}" class="btn btn-primary mb-3">Ajouter une échéance</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Modalité</th>
+            <th>Montant</th>
+            <th>Date limite</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in echeances %}
+        <tr>
+            <td>{{ e.nom }}</td>
+            <td>{{ e.modalite.nom }}</td>
+            <td>{{ e.montant }}</td>
+            <td>{{ e.date_limite }}</td>
+            <td>
+                <a href="{% url 'modifier_echeance' e.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'supprimer_echeance' e.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Aucune échéance enregistrée.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

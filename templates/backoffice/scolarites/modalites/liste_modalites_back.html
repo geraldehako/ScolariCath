@@ -1,0 +1,68 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4"> 
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+       Modalités de scolarité de l’établissement - <span class="text-danger">{{ etablissement.nom }}</span>
+    </h6>
+
+    <hr></br>
+
+    <table id="scolariteTable" class="display">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Niveau</th>
+                <th>Montant</th>
+                <th>Nombre d’échéances</th>
+                <th>Applicable aux non affectés</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for modalite in modalites %}
+                <tr>
+                    <td>{{ modalite.nom }}</td>
+                    <td>{{ modalite.niveau.nom }}</td>
+                    <td>{{ modalite.montant }} FCFA</td>
+                    <td>{{ modalite.nombre_echeances }}</td>
+                    <td>
+                        {% if modalite.applicable_aux_non_affectes %}
+                            ✅ Oui
+                        {% else %}
+                            ❌ Non
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'detail_echeances_modalite_back' modalite.id %}" class="btn btn-info btn-sm">
+                            Voir les échéances
+                        </a>
+                    </td>
+                </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+
+</br></br>
+<a href="{% url 'etablissements_par_cycle' %}" class="btn btn-secondary">← Retour aux établissements</a>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#scolariteTable').DataTable({
+        "language": {
+            "search": "Rechercher :",
+            "lengthMenu": "Afficher _MENU_ entrées",
+            "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+            "paginate": {
+                "first": "Premier",
+                "last": "Dernier",
+                "next": "Suivant",
+                "previous": "Précédent"
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

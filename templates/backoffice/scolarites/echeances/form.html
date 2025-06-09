@@ -1,0 +1,10 @@
+
+{% block content %}
+<h2>{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} une échéance</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+    <a href="{% url 'liste_echeances' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

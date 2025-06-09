@@ -1,0 +1,10 @@
+<h2>Ajouter un rôle</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Nom du rôle :</label>
+    <input type="text" name="nom" required>
+    <button type="submit">Ajouter</button>
+</form>
+
+<p><a href="{% url 'liste_roles' %}">← Retour à la liste</a></p>

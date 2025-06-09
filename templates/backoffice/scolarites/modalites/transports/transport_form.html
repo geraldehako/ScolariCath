@@ -1,0 +1,46 @@
+{% extends 'base/base back.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        {{ titre }} Nouvelle modalité transport {{ type }}
+    </h6>
+
+    <hr></br>
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="{{ form.mois.id_for_label }}">Mois</label>
+                {{ form.mois}}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="{{ form.nom.id_for_label }}">Nom</label>
+                {{ form.nom }}
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label" for="{{ form.montant.id_for_label }}">Montant (FCFA)</label>
+                {{ form.montant }}
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Enregistrer
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,89 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        {{ titre }} Modalités transport de l’établissement - <span class="text-danger">{{ etablissement.nom }}</span>
+    </h6>
+
+    <hr></br>
+
+    <div class="mb-3 text-end">
+        <a href="{% url 'ajouter_modalite_transport' etablissement.id %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Ajouter une modalité
+        </a>
+    </div>
+    
+
+    <table id="transportTable" class="display">
+        <thead>
+            <tr>
+                <th>Mois</th>
+                <th>Nom</th>
+                <th>Montant</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for modalite in modalites %}
+            <tr>
+                <td>{{ modalite.mois }}</td>
+                <td>{{ modalite.nom }}</td>
+                <td>{{ modalite.montant }} FCFA</td>
+                <td>
+                    <a href="{% url 'modifier_modalite_transport' modalite.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                
+                    <!-- Bouton pour ouvrir le modal -->
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ modalite.id }}">
+                        Supprimer
+                    </button>
+                
+                    <!-- Modal de confirmation -->
+                    <div class="modal fade" id="confirmDeleteModal{{ modalite.id }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ modalite.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="confirmDeleteLabel{{ modalite.id }}">Confirmer la suppression</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer la modalité <strong>{{ modalite.nom }} du Mois {{ modalite.mois }}</strong> ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <a href="{% url 'supprimer_modalite_transport' modalite.id %}" class="btn btn-danger">Oui, supprimer</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                
+            </tr>
+           
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </br></br>
+    <a href="{% url 'etablissements_par_cycle' %}" class="btn btn-secondary">← Retour aux établissements</a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#transportTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+ 
+{% endblock %}

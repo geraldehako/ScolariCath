@@ -1,0 +1,37 @@
+
+{% block content %}
+<h2>Liste des modalités de paiements</h2>
+<a href="{% url 'ajouter_modalite' %}" class="btn btn-primary mb-3">Ajouter une modalité</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Niveau</th>
+            <th>Établissement</th>
+            <th>Année scolaire</th>
+            <th>Non affectés ?</th>
+            <th>Échéances</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for modalite in modalites %}
+        <tr>
+            <td>{{ modalite.nom }}</td>
+            <td>{{ modalite.niveau.nom }}</td>
+            <td>{{ modalite.etablissement.nom }}</td>
+            <td>{{ modalite.annee_scolaire.nom }}</td>
+            <td>{{ modalite.applicable_aux_non_affectes|yesno:"Oui,Non" }}</td>
+            <td>{{ modalite.nombre_echeances }}</td>
+            <td>
+                <a href="{% url 'modifier_modalite' modalite.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'supprimer_modalite' modalite.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+                <a href="{% url 'detail_modalite' modalite.pk %}" class="btn btn-sm btn-info">Détail</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">Aucune modalité enregistrée.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
