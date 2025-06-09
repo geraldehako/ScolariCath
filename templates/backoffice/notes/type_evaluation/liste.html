@@ -1,0 +1,49 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        📊 Liste des types d’ <span class="text-danger">évaluation</span>
+    </h6>
+    <hr><br>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_type_evaluation' %}" class="btn btn-primary mb-3">➕ Ajouter</a>
+    </div>
+
+    <table id="baremeTable" class="table table-bordered table-striped">
+        <thead>
+            <tr><th>Libellé</th><th>Barème</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for t in types %}
+            <tr> 
+                <td>{{ t.libelle }}</td>
+                <td>/{{ t.bareme }}</td>
+                <td>
+                    <a href="{% url 'modifier_type_evaluation' t.pk %}" class="btn btn-sm btn-warning">✏️ modifier</a>
+                    <a href="{% url 'supprimer_type_evaluation' t.pk %}" class="btn btn-sm btn-danger">🗑️ supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#baremeTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

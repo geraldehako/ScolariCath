@@ -1,0 +1,96 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        🏫 Liste de nos <span class="text-danger">établissements</span>
+    </h6>
+    <hr></br>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_etablissement' %}" class="btn btn-primary">
+            <i class="typcn typcn-plus"></i> Ajouter un établissement
+        </a>
+    </div>
+
+    <form method="get" class="row mb-4">
+        <div class="col-md-4">
+            <input type="text" name="nom" value="{{ search_nom }}" class="form-control" placeholder="🔍 Rechercher par nom...">
+        </div>
+        <div class="col-md-4">
+            <select name="cycle" class="form-select">
+                <option value="">📚 Tous les cycles</option>
+                {% for cycle in cycles %}
+                    <option value="{{ cycle.id }}" {% if cycle.id|stringformat:"s" == selected_cycle %}selected{% endif %}>{{ cycle.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-info w-100">Filtrer</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'etablissements_par_cycle' %}" class="btn btn-secondary w-100">Réinitialiser</a>
+        </div>
+    </form>
+
+    <div class="row">
+        {% for etablissement in page_obj %}
+            {% cycle 'primary' 'success' 'info' 'warning' 'danger' as color silent %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card border-0 shadow bg-{{ color }} text-white h-100">
+                    <div class="card-header fw-bold text-uppercase">
+                        {{ etablissement.nom }}
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <p><strong>📌 Localisation :</strong> {{ etablissement.localisation }}</p>
+                        <p><strong>🎓 Cycle(s) :</strong>
+                            {% for type in etablissement.types.all %}
+                                {{ type.nom }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                Non spécifié
+                            {% endfor %}
+                        </p>
+                        <p><strong>👥 Effectif :</strong> {{ etablissement.nb_inscrits }} élève{{ etablissement.nb_inscrits|pluralize }}</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'detail_etablissement' etablissement.id %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-building"></i> Détails établissement
+                            </a>
+                            <a href="{% url 'liste_modalites_etablissement_back' etablissement.id %}" class="btn btn-secondary btn-sm">
+                                <i class="bi bi-journal-bookmark"></i> Niveaux & Modalités Scolarité
+                            </a>
+                            <a href="{% url 'modalites_transport' etablissement.id %}" class="btn btn-info btn-sm">
+                                <i class="bi bi-bus-front"></i> Modalités Transport
+                            </a>
+                            <a href="{% url 'modalites_cantine' etablissement.id %}" class="btn btn-warning btn-sm">
+                                <i class="bi bi-egg-fried"></i> Modalités Cantine
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning text-center">Aucun établissement trouvé.</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <nav class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if search_nom %}nom={{ search_nom }}&{% endif %}{% if selected_cycle %}cycle={{ selected_cycle }}&{% endif %}page={{ page_obj.previous_page_number }}">Précédent</a>
+                </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?{% if search_nom %}nom={{ search_nom }}&{% endif %}{% if selected_cycle %}cycle={{ selected_cycle }}&{% endif %}page={{ num }}">{{ num }}</a>
+                </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if search_nom %}nom={{ search_nom }}&{% endif %}{% if selected_cycle %}cycle={{ selected_cycle }}&{% endif %}page={{ page_obj.next_page_number }}">Suivant</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

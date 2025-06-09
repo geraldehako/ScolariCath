@@ -1,0 +1,41 @@
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Calendrier hebdomadaire – Classe : {{ classe.nom }}</h2>
+    <a href="{% url 'creer_emploi_temps' classe.id %}" class="btn btn-primary mb-3">+ Ajouter une séance</a>
+
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Heure</th>
+                {% for jour in jours %}
+                    <th>{{ jour|capfirst }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for heure in heures %}
+                <tr>
+                    <td>{{ heure }}</td>
+                    {% for jour in jours %}
+                        <td>
+                            {% for emploi in emplois %}
+                                {% if emploi.jour == jour and emploi.heure_debut|stringformat:"H:i" == heure %}
+                                    <div class="border p-1 bg-light">
+                                        <strong>{{ emploi.matiere.nom }}</strong><br>
+                                        {{ emploi.professeur.nom_complet }}<br>
+                                        {{ emploi.heure_debut }} - {{ emploi.heure_fin }}
+                                        <br>
+                                        <a href="{% url 'modifier_emploi' emploi.pk %}" class="btn btn-sm btn-outline-warning mt-1">✎</a>
+                                        <a href="{% url 'supprimer_emploi' emploi.pk %}" class="btn btn-sm btn-outline-danger">🗑</a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

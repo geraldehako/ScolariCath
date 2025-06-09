@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titre }}</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body class="container mt-5">
+    <h2 class="text-danger">{{ titre }}</h2>
+
+    <p>Es-tu sûr de vouloir supprimer <strong>{{ objet }}</strong> ?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+        <a href="{% url 'liste_cycles' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</body>
+</html>

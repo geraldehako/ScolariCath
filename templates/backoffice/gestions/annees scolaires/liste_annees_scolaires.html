@@ -1,0 +1,113 @@
+{% extends 'base/base back.html' %} 
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Liste des <span class="text-danger">Années Scolaires</span>
+</h6>
+<hr><br>
+
+<div class="mb-3 text-end">
+    <a href="{% url 'ajouter_annee_scolaire' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Ajouter
+    </a>
+</div>
+
+<table id="anneesTable" class="table table-striped table-bordered"> 
+    <thead class="table-primary text-center">
+        <tr>
+            <th>Libellé</th>
+            <th>Date de début</th>
+            <th>Date de fin</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for annee in annees_scolaires %}
+        <tr>
+            <td>{{ annee.libelle }}</td>
+            <td>{{ annee.date_debut }}</td>
+            <td>{{ annee.date_fin }}</td>
+            <td>
+                {% if annee.active %}
+                    <span class="badge bg-success">Oui</span>
+                {% else %}
+                    <span class="badge bg-secondary">Non</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if annee.active %}
+                    <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-check-circle"></i> Active</button>
+                {% else %}
+                    <a href="{% url 'activer_annee_scolaire' annee.pk %}" class="btn btn-sm btn-info">
+                        <i class="bi bi-lightning-charge"></i> Activer
+                    </a>
+                {% endif %}
+                <a href="{% url 'modifier_annee_scolaire' annee.pk %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil-square"></i> Modifier
+                </a>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#modalSuppression" data-id="{{ annee.id }}"
+                        data-libelle="{{ annee.libelle }}">
+                    <i class="bi bi-trash"></i> Supprimer
+                </button>
+                <a href="{% url 'generer_trimestres' annee.pk %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-calendar-plus"></i> Générer trimestres
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="modalSuppression" tabindex="-1" aria-labelledby="modalSuppressionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" id="formSuppression">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer l’année scolaire <strong id="anneeLibelle"></strong> ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#anneesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+<script>
+    // Préparation du formulaire de suppression
+    const modal = document.getElementById('modalSuppression');
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const libelle = button.getAttribute('data-libelle');
+        modal.querySelector('#anneeLibelle').textContent = libelle;
+        modal.querySelector('#formSuppression').action = `/annees/supprimer/${id}/`;  // à adapter selon ton URL
+    });
+</script>
+{% endblock %}

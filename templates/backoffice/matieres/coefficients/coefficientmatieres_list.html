@@ -1,0 +1,29 @@
+
+{% block content %}
+<h2>Coefficient des Matières par Niveau</h2>
+<a href="{% url 'coefficients:coefficientmatieres_create' %}" class="btn btn-primary mb-2">Ajouter un coefficient</a>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Matière</th>
+      <th>Niveau</th>
+      <th>Coefficient</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in coefficients %}
+    <tr>
+      <td>{{ item.matiere.nom }}</td>
+      <td>{{ item.niveau.nom }}</td>
+      <td>{{ item.coefficient }}</td>
+      <td>
+        <a href="{% url 'coefficients:coefficientmatieres_update' item.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+        <a href="{% url 'coefficients:coefficientmatieres_delete' item.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

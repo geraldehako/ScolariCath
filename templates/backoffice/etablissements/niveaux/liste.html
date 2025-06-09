@@ -1,0 +1,56 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        📅 Liste des <span class="text-danger">niveaux</span>
+    </h6>
+    <hr><br>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_niveau' %}" class="btn btn-primary mb-3">➕ Ajouter un type</a> 
+    </div>
+
+
+{% if niveaux %}
+<table id="moisTable" class="table table-bordered table-striped">
+    <thead class="table-primary text-center"> 
+        <tr>
+            <th>Nom</th>
+            <th>Cycle</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for niveau in niveaux %}
+        <tr>
+            <td>{{ niveau.nom }}</td>
+            <td>{{ niveau.cycle.nom }}</td>
+            <td>
+                <a href="{% url 'modifier_niveau' niveau.pk %}" class="btn btn-sm btn-warning" ><i class="bi bi-pencil-square"></i> Modifier</a>
+                <a href="{% url 'supprimer_niveau' niveau.pk %}" class="btn btn-sm btn-danger" ><i class="bi bi-trash"></i> Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>Aucun niveau enregistré.</p>
+{% endif %}
+<script>
+    $(document).ready(function() {
+        $('#moisTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

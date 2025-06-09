@@ -1,0 +1,95 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Liste des <span class="text-danger">cycles</span>
+    </h6>
+    <hr><br>
+    <div class="mb-3 text-end">
+        <a href="{% url 'ajouter_cycle' %}" class="btn btn-success"> 
+            <i class="bi bi-plus-circle"></i> Ajouter un Cycle
+        </a>
+    </div>
+
+    <table id="cycleTable" class="table table-bordered table-striped">
+        <thead class="table-primary text-center"> 
+            <tr>
+                <th>Code</th>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cycle in cycles %}
+                <tr>
+                    <td>{{ cycle.code }}</td>
+                    <td>{{ cycle.nom }}</td>
+                    <td>
+                        <a href="{% url 'modifier_cycle' cycle.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil-square"></i> Modifier
+                        </a>
+                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalSuppression" data-id="{{ cycle.id }}" data-nom="{{ cycle.nom }}">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </td>
+                </tr>
+            
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal de suppression -->
+    <div class="modal fade" id="modalSuppression" tabindex="-1" aria-labelledby="modalSuppressionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" id="formSuppression">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="modalSuppressionLabel">Confirmation de suppression</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir supprimer le cycle <strong id="nomCycle"></strong> ?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </div>
+                </div>
+            </form>
+        </div> 
+    </div>
+
+<script>
+    $(document).ready(function() {
+        $('#cycleTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+<script>
+        // Préparation du modal
+        var modal = document.getElementById('modalSuppression');
+        modal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var nom = button.getAttribute('data-nom');
+            var nomSpan = modal.querySelector('#nomCycle');
+            var form = modal.querySelector('#formSuppression');
+
+            nomSpan.textContent = nom;
+            form.action = `/cycles/supprimer/${id}/`; // Adapte si besoin
+        });
+    </script>
+
+{% endblock %}

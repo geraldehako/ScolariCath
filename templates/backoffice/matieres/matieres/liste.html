@@ -1,0 +1,105 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        📅 Liste des <span class="text-danger">matières</span>
+    </h6>
+    <hr><br>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_matiere' %}" class="btn btn-primary mb-3">➕ Ajouter une matière</a> 
+    </div>
+
+    <table id="moisTable" class="table table-bordered table-striped">
+        <thead class="table-primary text-center"> 
+            <tr>
+                <th>Nom</th>
+                <th>Cycle</th>
+                <th>Coefficients</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for matiere in matieres %}
+                <tr>
+                    <td>{{ matiere.nom }}</td>
+                    <td>{{ matiere.cycle.nom }}</td>
+                    <td>
+                        <!-- À l'intérieur du <td> des coefficients -->
+                        <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#coefMatiere{{ matiere.pk }}">
+                            Voir les coefficients
+                        </button>
+                        <div class="collapse" id="coefMatiere{{ matiere.pk }}">
+                            <ul class="list-group mt-2">
+                                {% for coef in matiere.coefficientmatieres_set.all %}
+                                    <li class="list-group-item">{{ coef.niveau.nom }} : {{ coef.coefficient }}</li>
+                                {% empty %}
+                                    <li class="list-group-item">Aucun coefficient défini</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                    </td>
+                    <td>
+                        <a href="{% url 'modifier_matiere' matiere.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+                        <!-- Bouton Supprimer -->
+                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalSuppression" data-id="{{ matiere.pk }}">
+                            Supprimer
+                        </button>
+
+                        <a href="{% url 'ajouter_coefficient' matiere.pk %}" class="btn btn-sm btn-info">Ajouter coefficient</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="modal fade" id="modalSuppression" tabindex="-1" aria-labelledby="modalSuppressionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <form method="post" id="formSuppression">
+              {% csrf_token %}
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalSuppressionLabel">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+              </div>
+              <div class="modal-body">
+                Voulez-vous vraiment supprimer cette matière ?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+    </div>
+      
+</div>
+    <script>
+        $(document).ready(function() {
+            $('#moisTable').DataTable({
+                "language": {
+                    "search": "Rechercher :",
+                    "lengthMenu": "Afficher _MENU_ entrées",
+                    "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        const modalSuppression = document.getElementById('modalSuppression');
+        modalSuppression.addEventListener('show.bs.modal', function (event) {
+          const button = event.relatedTarget;
+          const matiereId = button.getAttribute('data-id');
+          const form = document.getElementById('formSuppression');
+          form.action = `/matieres/supprimer/${matiereId}/`;  // ou utilise {% url 'supprimer_matiere' 0 %} et remplace le 0 en JS si tu veux
+        });
+      </script>
+      
+{% endblock %}

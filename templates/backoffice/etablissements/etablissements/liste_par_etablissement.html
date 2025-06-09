@@ -1,0 +1,31 @@
+<h2>Classes de {{ etablissement.nom }} pour l'année scolaire {{ annee_active.nom }}</h2>
+
+{% if classes %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Niveau</th>
+                <th>Capacité</th>
+                <th>Nombre d'élèves</th>
+                <th>Actions</th>  <!-- Nouvelle colonne -->
+            </tr>
+        </thead>
+        <tbody>
+        {% for classe in classes %}
+            <tr>
+                <td>{{ classe.nom }}</td>
+                <td>{{ classe.niveau.nom }}</td>
+                <td>{{ classe.capacite }}</td>
+                <td>{{ classe.nb_eleves }}</td>
+                <td>
+                    <a href="{% url 'creer_emploi_temps' classe.id %}" class="btn btn-sm btn-primary">Ajouter emploi du temps</a>
+                    <a href="{% url 'calendrier_emploi_classe' classe.id %}" class="btn btn-sm btn-primary">emploi du temps</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucune classe trouvée pour cette année scolaire.</p>
+{% endif %}

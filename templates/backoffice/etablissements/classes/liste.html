@@ -1,0 +1,32 @@
+<h1>Liste des classes</h1>
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Niveau</th>
+            <th>Établissement</th>
+            <th>Année scolaire</th>
+            <th>Capacité</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for classe in classes %}
+        <tr>
+            <td>{{ classe.nom }}</td>
+            <td>{{ classe.niveau.nom }}</td>
+            <td>
+                {{ classe.etablissement.nom }}
+                <a href="{% url 'ajouter_classe_etablissement' classe.etablissement.id %}">➕ Ajouter classe</a>
+            </td>
+            <td>{{ classe.annee_scolaire.libelle }}</td>
+            <td>{{ classe.capacite }}</td>
+            <td>
+                <a href="{% url 'modifier_classe' classe.pk %}">Modifier</a> |
+                <a href="{% url 'supprimer_classe' classe.pk %}">Supprimer</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

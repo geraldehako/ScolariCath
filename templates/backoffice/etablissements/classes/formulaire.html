@@ -1,0 +1,8 @@
+<h1>{% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} une classe</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enregistrer</button>
+    <a href="{% url 'liste_classes' %}">Annuler</a>
+</form>
