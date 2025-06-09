@@ -1,0 +1,59 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        🔐 Liste des <span class="text-danger">rôles</span>
+    </h6>
+    <hr><br>
+
+    <div class="mb-3 text-end">
+        <a href="{% url 'creer_role' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nouveau rôle
+        </a>
+    </div>
+
+    <table id="rolesTable" class="table table-bordered table-striped">
+        <thead class="table-primary text-center"> 
+            <tr>
+                <th>Nom du rôle</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for role in roles %}
+            <tr>
+                <td>{{ role.nom }}</td>
+                <td>
+                    <a href="{% url 'modifier_role' role.id %}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i> Modifier</a>
+                    <a href="{% url 'gestion_acces_role' role.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Accès</a>
+                    <form action="{% url 'supprimer_role' role.id %}" method="post" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $('#rolesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+      Liste des utilisateurs – <span class="text-danger">des chefs d’établissement et des directeurs d’école</span> 
+    </h6>
+    <hr></br>
+
+
+    <table id="utilisateursTable" class="display">
+        <thead>
+            <tr>
+                <th>Nom complet</th>
+                <th>Établissement</th>
+                <th>Téléphone</th>
+                <th>Identifiant</th>
+                <th>Mot de passe</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for utilisateur in utilisateurs %}
+            <tr>
+                <td>{{ utilisateur.nom_complet }}</td>
+                <td>{{ utilisateur.etablissement.nom }}</td>
+                <td>{{ utilisateur.telephone }}</td>
+                <td>{{ utilisateur.username }}</td>
+                <td>
+                    <span id="pwd-{{ utilisateur.id }}">••••••••</span>
+                    <i class="bi bi-eye-slash" id="toggle-pwd-{{ utilisateur.id }}" style="cursor: pointer;" 
+                       onclick="togglePassword({{ utilisateur.id }}, '{{ utilisateur.pwd }}')"></i>
+                </td>                
+                <td>
+                    <a href="{% url 'modifier_utilisateur_pwd' utilisateur.pk %}" class="btn btn-sm btn-success">
+                        Changer mot de passe
+                    </a>
+                    <a href="{% url 'modifier_utilisateur_direc' utilisateur.pk %}" class="btn btn-sm btn-primary">
+                        Modifier
+                    </a>
+                    
+                    {% if utilisateur.is_active %}
+                          <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal{{ utilisateur.id }}">
+                            Désactiver
+                          </button>
+                    {% else %}
+                          <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal{{ utilisateur.id }}">
+                            Activer
+                          </button>
+                        {% endif %}
+                </td>
+                      
+                      <!-- MODALE de confirmation -->
+                      <div class="modal fade" id="confirmModal{{ utilisateur.id }}" tabindex="-1" aria-labelledby="confirmLabel{{ utilisateur.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title text-danger" id="confirmLabel{{ utilisateur.id }}">
+                                Confirmation
+                              </h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body">
+                              {% if utilisateur.is_active %}
+                                Êtes-vous sûr de vouloir <strong>désactiver</strong> l’utilisateur <strong>{{ utilisateur.nom_complet }}</strong> ?
+                              {% else %}
+                                Voulez-vous <strong>activer</strong> l’utilisateur <strong>{{ utilisateur.nom_complet }}</strong> ?
+                              {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                              <a href="{% url 'basculer_utilisateur' utilisateur.id %}" class="btn {% if utilisateur.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                Oui, confirmer
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    function togglePassword(userId, realPassword) {
+        const pwdSpan = document.getElementById(`pwd-${userId}`);
+        const icon = document.getElementById(`toggle-pwd-${userId}`);
+    
+        if (pwdSpan.innerText === '••••••••') {
+            pwdSpan.innerText = realPassword;
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        } else {
+            pwdSpan.innerText = '••••••••';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    }
+    </script>
+    
+<script>
+    $(document).ready(function() {
+        $('#utilisateursTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

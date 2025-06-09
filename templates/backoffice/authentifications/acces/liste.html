@@ -1,0 +1,89 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        🔐 Liste des accès par <span class="text-danger">rôle</span>
+    </h6>
+    <hr><br>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{% url 'creer_acces' %}" class="btn btn-success">
+            ➕ Ajouter un accès
+        </a>
+    </div>  
+
+        <table id="accesTable" class="table table-bordered table-hover">
+            <thead class="table-primary text-center"> 
+                <tr>
+                    <th>Rôle / Utilisateur</th>
+                    <th>Fonctionnalité</th>
+                    <th>Code</th>
+                    <th>Autorisé</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in acces %}
+                <tr>
+                    <td>{{ item.role.nom }}</td>
+                    <td>{{ item.fonctionnalite }}</td>
+                    <td>{{ item.code }}</td>
+                    <td class="text-center">
+                        <input type="checkbox" class="form-check-input autorisation-checkbox"
+                              data-id="{{ item.id }}"
+                              {% if item.autorise %}checked{% endif %}>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#accesTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+<script>
+  $(document).ready(function() {
+      
+      // Activer AJAX sur les checkbox
+      $('.autorisation-checkbox').on('change', function() {
+          const id = $(this).data('id');
+          const autorise = this.checked;
+  
+          fetch("{% url 'maj_acces_ajax' %}", {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRFToken': '{{ csrf_token }}'
+              },
+              body: new URLSearchParams({ id, autorise })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (!data.success) {
+                  alert('❌ Erreur : ' + data.error);
+                  this.checked = !autorise;
+              }
+          })
+          .catch(error => {
+              alert('📡 Erreur réseau : ' + error);
+              this.checked = !autorise;
+          });
+      });
+  });
+  </script>
+  
+{% endblock %}

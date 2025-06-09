@@ -1,0 +1,33 @@
+<!-- templates/authentifications/gestion_acces_role.html -->
+
+
+{% block content %}
+<h2>Gestion des accès pour le rôle : {{ role.nom }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Fonctionnalité</th>
+                <th>Code</th>
+                <th>Autorisé ?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in acces %}
+                <tr>
+                    <td>{{ a.fonctionnalite }}</td>
+                    <td><code>{{ a.code }}</code></td>
+                    <td>
+                        <input type="checkbox" name="autorise_{{ a.id }}" {% if a.autorise %}checked{% endif %}>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+</form>
+
+<a href="{% url 'liste_roles' %}" class="btn btn-secondary mt-3">Retour à la liste des rôles</a>
+{% endblock %}

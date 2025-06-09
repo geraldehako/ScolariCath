@@ -1,0 +1,35 @@
+{% extends 'base/base back.html' %}
+{% block content %}
+<div class="container mt-4">
+    
+    <h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+        Modifier <span class="text-danger">le mot de passe</span>
+    </h6>
+    <hr><br>
+    <p><strong>Nom :</strong> {{ utilisateur.last_name }}</p>
+    <p><strong>Prénoms :</strong> {{ utilisateur.first_name }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form.nouveau_mot_de_passe.label_tag }} {{ form.nouveau_mot_de_passe }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.confirmation_mot_de_passe.label_tag }} {{ form.confirmation_mot_de_passe }}
+            </div>
+        </div>
+        
+        
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Mettre à jour
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+          </div>
+    </form>
+</div>
+{% endblock %}

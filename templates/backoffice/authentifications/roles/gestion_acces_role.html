@@ -1,0 +1,78 @@
+{% extends 'base/base back.html' %}
+{% load static %}
+{% block content %}
+
+<h6 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 1px;">
+    Accès pour le rôle <span class="text-danger">{{ role.nom }}</span>
+</h6>
+<hr><br>
+<table id="cycleTable" class="table table-bordered table-striped">
+    <thead class="table-primary text-center"> 
+        <tr>
+            <th>Fonctionnalité</th>
+            <th>Code</th>
+            <th class="text-center">Autorisé ?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in acces %}
+        <tr>
+            <td>{{ a.fonctionnalite }}</td>
+            <td><code>{{ a.code }}</code></td>
+            <td class="text-center">
+                <input type="checkbox" class="toggle-access" data-id="{{ a.id }}" {% if a.autorise %}checked{% endif %}>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'liste_roles' %}" class="btn btn-secondary mt-3"> <i class="bi bi-arrow-left"></i> Retour</a>
+
+<script>
+  $(function() {
+    $('.toggle-access').change(function() {
+        const checkbox = $(this);
+        const id = checkbox.data('id');
+        const autorise = checkbox.is(':checked');
+
+        $.ajax({
+            url: "{% url 'maj_acces_ajax' %}",
+            type: "POST",
+            data: {
+                'id': id,
+                'autorise': autorise,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success: function(data) {
+                if (data.success) {
+                    console.log("Mis à jour");
+                } else {
+                    alert("Erreur : " + data.error);
+                }
+            },
+            error: function() {
+                alert("Erreur serveur.");
+            }
+        });
+    });
+  });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#cycleTable').DataTable({
+            "language": {
+                "search": "Rechercher :",
+                "lengthMenu": "Afficher _MENU_ entrées",
+                "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
